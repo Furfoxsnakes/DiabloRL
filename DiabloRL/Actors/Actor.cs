@@ -42,7 +42,7 @@ namespace DiabloRL.Actors
             System.Console.WriteLine($"{Name} has been slain");
             
             if (this is Monster monster)
-                (CurrentMap as DiabloRLMap)?.RemoveMonster(monster);
+                (CurrentMap as DungeonMap)?.RemoveMonster(monster);
 
             if (this is Player)
             {

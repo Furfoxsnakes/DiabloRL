@@ -1,17 +1,21 @@
-﻿using DiabloRL.Actors;
+﻿using System;
+using DiabloRL.Actors;
 using GoRogue;
 using GoRogue.GameFramework;
 using GoRogue.MapGeneration;
 using GoRogue.MapViews;
 using Microsoft.Xna.Framework;
 using SadConsole;
+using SadConsole.Actions;
 using XnaRect = Microsoft.Xna.Framework.Rectangle;
 
 namespace DiabloRL
 {
     internal class MapScreen : ContainerConsole
     {
-        public DiabloRLMap Map { get; }
+        public DungeonMap Map { get; }
+        public GameFrameManager GameFrameManager { get; private set; }
+        public ActionStack Actions { get; private set; }
 
         public ScrollingConsole MapRenderer { get; }
 
@@ -19,6 +23,10 @@ namespace DiabloRL
         public MapScreen(int mapWidth, int mapHeight, int viewportWidth, int viewportHeight)
         {
             Map = GenerateDungeon(mapWidth, mapHeight);
+
+            GameFrameManager = new GameFrameManager(Map);
+            GameFrameManager.LogicFrameCompleted += OnLogicCompleted;
+            Actions = new ActionStack();
 
             // Get a console that's set up to render the map, and add it as a child of this container so it renders
             MapRenderer = Map.CreateRenderer(new XnaRect(0, 0, viewportWidth, viewportHeight),
@@ -37,6 +45,11 @@ namespace DiabloRL
             MapRenderer.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
         }
 
+        private void OnLogicCompleted(object? sender, EventArgs e)
+        {
+            Game.InputManager.IsPlayerTurn = true;
+        }
+
         private void ControlledGameObjectChanged(object s, ControlledGameObjectChangedArgs e)
         {
             if (e.OldObject != null)
@@ -45,10 +58,10 @@ namespace DiabloRL
             ((BasicMap) s).ControlledGameObject.Moved += Player_Moved;
         }
 
-        private static DiabloRLMap GenerateDungeon(int width, int height)
+        private static DungeonMap GenerateDungeon(int width, int height)
         {
             // Same size as screen, but we set up to center the camera on the player so expanding beyond this should work fine with no other changes.
-            var map = new DiabloRLMap(width, height);
+            var map = new DungeonMap(width, height);
 
             // Generate map via GoRogue, and update the real map with appropriate terrain.
             var tempMap = new ArrayMap<bool>(map.Width, map.Height);
@@ -89,6 +102,15 @@ namespace DiabloRL
             else // Wall
                 return new BasicTerrain(Color.White, Color.Black, '#', position, isWalkable: false,
                     isTransparent: false);
+        }
+
+        public override void Update(TimeSpan timeElapsed)
+        {
+            base.Update(timeElapsed);
+
+            GameFrameManager.Update(MapRenderer, timeElapsed);
+            Actions.Run(timeElapsed);
+            // Game.InputManager.Actions.Run(timeElapsed);
         }
     }
 }

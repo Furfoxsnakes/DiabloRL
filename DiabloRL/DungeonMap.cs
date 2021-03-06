@@ -16,7 +16,7 @@ namespace DiabloRL
         PLAYER
     }
 
-    internal class DiabloRLMap : BasicMap
+    internal class DungeonMap : BasicMap
     {
         // Handles the changing of tile/entity visiblity as appropriate based on Map.FOV.
         public FOVVisibilityHandler FovVisibilityHandler { get; }
@@ -32,7 +32,7 @@ namespace DiabloRL
         public ReadOnlyCollection<Monster> Monsters => _monsters.AsReadOnly();
         private List<Monster> _monsters = new List<Monster>();
 
-        public DiabloRLMap(int width, int height)
+        public DungeonMap(int width, int height)
             // Allow multiple items on the same location only on the items layer.  This example uses 8-way movement, so Chebyshev distance is selected.
             : base(width, height, Enum.GetNames(typeof(MapLayer)).Length - 1, Distance.CHEBYSHEV,
                 entityLayersSupportingMultipleItems: LayerMasker.DEFAULT.Mask((int) MapLayer.ITEMS))
