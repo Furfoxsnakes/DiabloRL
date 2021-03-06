@@ -1,4 +1,5 @@
-﻿using GoRogue;
+﻿using DiabloRL.Actors;
+using GoRogue;
 using GoRogue.GameFramework;
 using GoRogue.MapGeneration;
 using GoRogue.MapViews;
@@ -32,7 +33,7 @@ namespace DiabloRL
             Map.ControlledGameObjectChanged += ControlledGameObjectChanged;
 
             // Calculate initial FOV and center camera
-            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.SQUARE);
+            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.DIAMOND);
             MapRenderer.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
         }
 
@@ -61,9 +62,8 @@ namespace DiabloRL
             for (int i = 0; i < 10; i++)
             {
                 posToSpawn = map.WalkabilityView.RandomPosition(true); // Get a location that is walkable
-                var goblin = new BasicEntity(Color.Red, Color.Transparent, 'g', posToSpawn, (int) MapLayer.MONSTERS,
-                    isWalkable: false, isTransparent: true);
-                map.AddEntity(goblin);
+                var zombie = Zombie.Create(1, posToSpawn);
+                map.AddMonster(zombie);
             }
 
             // Spawn player
@@ -76,7 +76,7 @@ namespace DiabloRL
 
         private void Player_Moved(object sender, ItemMovedEventArgs<IGameObject> e)
         {
-            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.SQUARE);
+            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.DIAMOND);
             MapRenderer.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
         }
 

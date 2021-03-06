@@ -1,14 +1,16 @@
 ﻿using System.Collections.Generic;
 using DiabloRL.Actors;
+using DiabloRL.Components;
 using GoRogue;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using SadConsole;
+using Keyboard = SadConsole.Input.Keyboard;
 
 namespace DiabloRL
 {
     // Custom class for the player is used in this example just so we can handle input.  This could be done via a component, or in a main screen, but for simplicity we do it here.
-    internal class Player : Actor
+    public class Player : Actor
     {
         private static readonly Dictionary<Keys, Direction> s_movementDirectionMapping = new Dictionary<Keys, Direction>
         {
@@ -22,11 +24,17 @@ namespace DiabloRL
         public int FOVRadius;
 
         public Player(Coord position)
-            : base(Color.White, Color.Black, '@', position, (int) MapLayer.PLAYER, isWalkable: false,
-                isTransparent: true) => FOVRadius = 10;
+            : base(Color.White, Color.Black, '@', "Player", position, (int) MapLayer.PLAYER, isWalkable: false,
+                isTransparent: true)
+        {
+            FOVRadius = 10;
+
+            var stats = new Stats(30, 10, 20, 25, 70, 10);
+            AddGoRogueComponent(stats);
+        }
 
 
-        public override bool ProcessKeyboard(SadConsole.Input.Keyboard info)
+        public override bool ProcessKeyboard(Keyboard info)
         {
             Direction moveDirection = Direction.NONE;
 
@@ -40,12 +48,10 @@ namespace DiabloRL
                 }
             }
 
-            Position += moveDirection;
-
             if (moveDirection != Direction.NONE)
-                return true;
-            else
-                return base.ProcessKeyboard(info);
+                Game.InputManager.MovePlayer(this, moveDirection);
+            
+            return base.ProcessKeyboard(info);
         }
     }
 }

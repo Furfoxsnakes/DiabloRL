@@ -1,11 +1,14 @@
-﻿namespace DiabloRL
+﻿using DiabloRL.Systems;
+
+namespace DiabloRL
 {
-    internal class Program
+    internal class Game
     {
         private const int StartingWidth = 80;
         private const int StartingHeight = 25;
 
         public static MapScreen MapScreen { get; set; }
+        public static InputManager InputManager { get; private set; }
 
         private static void Main()
         {
@@ -22,6 +25,8 @@
 
         private static void Init()
         {
+            InputManager = new InputManager();
+            
             // Here we pass the viewport and map size as the same, but the map could be larger and the camera would center on the player.
             MapScreen = new MapScreen(StartingWidth, StartingHeight, StartingWidth, StartingHeight);
             SadConsole.Global.CurrentScreen = MapScreen;
