@@ -1,5 +1,6 @@
 ﻿using System;
 using DiabloRL.Actors;
+using DiabloRL.Enums;
 using GoRogue;
 using GoRogue.GameFramework;
 using GoRogue.MapGeneration;
@@ -75,7 +76,7 @@ namespace DiabloRL
             for (int i = 0; i < 10; i++)
             {
                 posToSpawn = map.WalkabilityView.RandomPosition(true); // Get a location that is walkable
-                var zombie = Zombie.Create(1, posToSpawn);
+                var zombie = Zombie.Create(Difficulties.NORMAL, posToSpawn);
                 map.AddMonster(zombie);
             }
 

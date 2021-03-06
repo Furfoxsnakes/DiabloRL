@@ -1,25 +1,37 @@
-﻿using DiabloRL.Actors;
+﻿using System;
+using DiabloRL.Actors;
+using DiabloRL.Enums;
 using SadConsole.Components.GoRogue;
 
 namespace DiabloRL.Components
 {
+    [Serializable]
     public class Stats : ComponentBase<Actor>
     {
-        public int Strength { get; set; }
-        public int Magic { get; set; }
-        public int Dexterity { get; set; }
-        public int Vitality { get; set; }
-        public int Life { get; set; }
-        public int Mana { get; set; }
+        public int this[StatTypes type]
+        {
+            get => _data[(int) type];
+            set => SetValue(type, value);
+        }
+        
+        private int[] _data;
 
         public Stats(int strength, int magic, int dexterity, int vitality, int life, int mana)
         {
-            Strength = strength;
-            Magic = magic;
-            Dexterity = dexterity;
-            Vitality = vitality;
-            Life = life;
-            Mana = mana;
+            _data = new int[(int) StatTypes.Count];
+            this[StatTypes.STRENGTH] = strength;
+            this[StatTypes.MAGIC] = magic;
+            this[StatTypes.DEXTERITY] = dexterity;
+            this[StatTypes.VITALITY] = vitality;
+            this[StatTypes.LIFE] = life;
+            this[StatTypes.MANA] = mana;
+        }
+        
+        private void SetValue(StatTypes type, int value)
+        {
+            if (_data[(int) type] == value) return;
+            
+            _data[(int)type] = value;
         }
     }
 }

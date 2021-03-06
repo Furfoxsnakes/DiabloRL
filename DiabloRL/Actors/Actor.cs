@@ -1,4 +1,5 @@
 ﻿using DiabloRL.Components;
+using DiabloRL.Enums;
 using GoRogue;
 using Microsoft.Xna.Framework;
 using SadConsole;
@@ -26,15 +27,15 @@ namespace DiabloRL.Actors
             
             System.Console.WriteLine($"{Name} takes {amount} point(s) of damage.");
 
-            stats.Life -= amount;
+            stats[StatTypes.LIFE] -= amount;
 
-            if (stats.Life <= 0)
+            if (stats[StatTypes.LIFE] <= 0)
             {
                 Die();
                 return;
             }
 
-            System.Console.WriteLine($"{Name} has {stats.Life} life remaining");
+            System.Console.WriteLine($"{Name} has {stats[StatTypes.LIFE]} life remaining");
         }
 
         private void Die()
