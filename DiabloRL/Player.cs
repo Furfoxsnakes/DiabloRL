@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using DiabloRL.Actors;
 using DiabloRL.Components;
+using DiabloRL.Enums;
 using GoRogue;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -29,10 +30,15 @@ namespace DiabloRL
         {
             FOVRadius = 10;
 
-            var stats = new Stats(30, 10, 20, 25, 70, 10);
+            var stats = new Stats();
+            stats[StatTypes.STRENGTH] = 30;
+            stats[StatTypes.MAGIC] = 10;
+            stats[StatTypes.DEXTERITY] = 20;
+            stats[StatTypes.VITALITY] = 25;
+            stats[StatTypes.LIFE] = 70;
+            stats[StatTypes.MANA] = 10;
             AddGoRogueComponent(stats);
         }
-
 
         public override bool ProcessKeyboard(Keyboard info)
         {

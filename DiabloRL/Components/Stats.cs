@@ -16,15 +16,9 @@ namespace DiabloRL.Components
         
         private int[] _data;
 
-        public Stats(int strength, int magic, int dexterity, int vitality, int life, int mana)
+        public Stats()
         {
             _data = new int[(int) StatTypes.Count];
-            this[StatTypes.STRENGTH] = strength;
-            this[StatTypes.MAGIC] = magic;
-            this[StatTypes.DEXTERITY] = dexterity;
-            this[StatTypes.VITALITY] = vitality;
-            this[StatTypes.LIFE] = life;
-            this[StatTypes.MANA] = mana;
         }
         
         private void SetValue(StatTypes type, int value)

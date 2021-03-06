@@ -73,7 +73,7 @@ namespace DiabloRL
 
             Coord posToSpawn;
             // Spawn a few mock enemies
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1; i++)
             {
                 posToSpawn = map.WalkabilityView.RandomPosition(true); // Get a location that is walkable
                 var zombie = Zombie.Create(Difficulties.NORMAL, posToSpawn);

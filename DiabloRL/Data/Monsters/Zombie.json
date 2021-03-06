@@ -1,0 +1,63 @@
+{
+  "DungeonLevelMin": 1,
+  "DungeonLevelMax": 2,
+  "MonsterLevel": 1,
+  "HealthRange": {
+    "NORMAL": [
+      2,
+      3
+    ],
+    "NIGHTMARE": [
+      56,
+      59
+    ],
+    "HELL": [
+      108,
+      112
+    ]
+  },
+  "ArmourClass": {
+    "NORMAL": 5,
+    "NIGHTMARE": 55,
+    "HELL": 85
+  },
+  "ToHit": {
+    "NORMAL": 10,
+    "NIGHTMARE": 95,
+    "HELL": 130
+  },
+  "DamageRange": {
+    "NORMAL": [
+      2,
+      5
+    ],
+    "NIGHTMARE": [
+      8,
+      14
+    ],
+    "HELL": [
+      14,
+      26
+    ]
+  },
+  "MagicResistance": {
+    "NORMAL": 2,
+    "NIGHTMARE": 0,
+    "HELL": 2
+  },
+  "FireResistance": {
+    "NORMAL": 0,
+    "NIGHTMARE": 0,
+    "HELL": 0
+  },
+  "LightningResistance": {
+    "NORMAL": 0,
+    "NIGHTMARE": 0,
+    "HELL": 0
+  },
+  "BaseExperience": {
+    "NORMAL": 54,
+    "NIGHTMARE": 2108,
+    "HELL": 4216
+  }
+}
