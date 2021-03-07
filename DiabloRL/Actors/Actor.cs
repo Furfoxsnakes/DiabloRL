@@ -15,41 +15,36 @@ namespace DiabloRL.Actors
             Name = name;
         }
 
-        public void TakeDamage(int amount)
+        public virtual void TakeDamage(int amount)
         {
-            var stats = GetGoRogueComponent<Stats>();
-
-            if (stats == null)
-            {
-                System.Console.WriteLine($"{Name} does not have a stats component and therefore cannot take damage.");
-                return;
-            }
-            
-            System.Console.WriteLine($"{Name} takes {amount} point(s) of damage.");
-
-            stats[StatTypes.LIFE] -= amount;
-
-            if (stats[StatTypes.LIFE] <= 0)
-            {
-                Die();
-                return;
-            }
-
-            System.Console.WriteLine($"{Name} has {stats[StatTypes.LIFE]} life remaining");
+            // handled by inheriting class
         }
 
-        private void Die()
+        public virtual void Attack(Actor defender)
+        {
+            if (ResolveToHit(defender))
+            {
+                defender.TakeDamage(ResolveDamage(defender));
+            }
+            else
+            {
+                System.Console.WriteLine($"{Name} missed {defender.Name}");
+            }
+        }
+
+        protected virtual void Die()
         {
             System.Console.WriteLine($"{Name} has been slain");
-            
-            if (this is Monster monster)
-                (CurrentMap as DungeonMap)?.RemoveMonster(monster);
+        }
 
-            if (this is Player)
-            {
-                // End the game
-                // TODO: Create an end game screen
-            }
+        protected virtual bool ResolveToHit(Actor defender)
+        {
+            return true;
+        }
+
+        protected virtual int ResolveDamage(Actor defender)
+        {
+            return 0;
         }
     }
 }

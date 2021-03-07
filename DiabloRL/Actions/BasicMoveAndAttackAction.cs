@@ -25,7 +25,7 @@ namespace DiabloRL.Actions
 
             var actor = Source.CurrentMap.GetEntity<Actor>(Source.Position + _dir);
             if (actor == Target)
-                Target.TakeDamage(1);
+                Source.Attack(Target);
             
             Finish(new ActionResult(true));
         }

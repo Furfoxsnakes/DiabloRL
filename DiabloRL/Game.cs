@@ -1,4 +1,5 @@
-﻿using DiabloRL.Systems;
+﻿using System;
+using DiabloRL.Systems;
 
 namespace DiabloRL
 {
@@ -9,6 +10,7 @@ namespace DiabloRL
 
         public static MapScreen MapScreen { get; set; }
         public static InputManager InputManager { get; private set; }
+        public static Random Random { get; private set; }
 
         private static void Main()
         {
@@ -25,6 +27,7 @@ namespace DiabloRL
 
         private static void Init()
         {
+            Random = new Random((int)System.DateTime.UtcNow.Ticks);
             InputManager = new InputManager();
             
             // Here we pass the viewport and map size as the same, but the map could be larger and the camera would center on the player.

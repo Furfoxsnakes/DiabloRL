@@ -10,6 +10,9 @@
         VITALITY,
         LIFE,
         MANA,
+        ARMOUR,
+        LGOL,   // Life Gain On Levelup
+        MGOL,   // Mana Gain On Levelup
         Count
     }
 }

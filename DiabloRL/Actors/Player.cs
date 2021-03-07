@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using DiabloRL.Actors;
 using DiabloRL.Components;
 using DiabloRL.Enums;
 using GoRogue;
+using GoRogue.DiceNotation;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using SadConsole;
 using Keyboard = SadConsole.Input.Keyboard;
 
 namespace DiabloRL
@@ -23,6 +24,10 @@ namespace DiabloRL
         };
 
         public int FOVRadius;
+        public Stats Stats => GetGoRogueComponent<Stats>();
+        public int MinDamage = 2;
+        public int MaxDamage = 4;
+        public int Armour => Stats[StatTypes.DEXTERITY] / 5;
 
         public Player(Coord position)
             : base(Color.White, Color.Black, '@', "Player", position, (int) MapLayer.PLAYER, isWalkable: false,
@@ -58,6 +63,50 @@ namespace DiabloRL
                 Game.InputManager.MovePlayer(this, moveDirection);
             
             return base.ProcessKeyboard(info);
+        }
+
+        public override void TakeDamage(int amount)
+        {
+            // var stats = GetGoRogueComponent<Stats>();
+
+            if (Stats == null)
+            {
+                System.Console.WriteLine($"{Name} does not have a stats component and therefore cannot take damage.");
+                return;
+            }
+            
+            System.Console.WriteLine($"{Name} takes {amount} point(s) of damage.");
+
+            Stats[StatTypes.LIFE] -= amount;
+
+            if (Stats[StatTypes.LIFE] <= 0)
+            {
+                Die();
+                return;
+            }
+
+            System.Console.WriteLine($"{Name} has {Stats[StatTypes.LIFE]} life remaining");
+        }
+
+        protected override bool ResolveToHit(Actor defender)
+        {
+            var monster = defender as Monster;
+            var toHit = 50 + (Stats[StatTypes.DEXTERITY] / 2) + Stats[StatTypes.LEVEL]
+                        - monster.Stats[MonsterStatTypes.ARMOUR_CLASS];
+            return Dice.Roll("1d100") < toHit;
+        }
+
+        protected override int ResolveDamage(Actor defender)
+        {
+            var damage = Game.Random.Next(MinDamage, MaxDamage + 1);
+            
+            // double damage on critical hit
+            if (Dice.Roll("1d100") < Stats[StatTypes.LEVEL])
+                damage *= 2;
+            
+            // other calculations in the future
+
+            return damage;
         }
     }
 }

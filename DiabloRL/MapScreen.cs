@@ -1,5 +1,6 @@
 ﻿using System;
 using DiabloRL.Actors;
+using DiabloRL.Components;
 using DiabloRL.Enums;
 using GoRogue;
 using GoRogue.GameFramework;
@@ -15,8 +16,8 @@ namespace DiabloRL
     internal class MapScreen : ContainerConsole
     {
         public DungeonMap Map { get; }
-        public GameFrameManager GameFrameManager { get; private set; }
-        public ActionStack Actions { get; private set; }
+        public GameFrameManager GameFrameManager { get; }
+        public ActionStack Actions { get; }
 
         public ScrollingConsole MapRenderer { get; }
 
@@ -73,7 +74,7 @@ namespace DiabloRL
 
             Coord posToSpawn;
             // Spawn a few mock enemies
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 10; i++)
             {
                 posToSpawn = map.WalkabilityView.RandomPosition(true); // Get a location that is walkable
                 var zombie = Zombie.Create(Difficulties.NORMAL, posToSpawn);
@@ -111,7 +112,6 @@ namespace DiabloRL
 
             GameFrameManager.Update(MapRenderer, timeElapsed);
             Actions.Run(timeElapsed);
-            // Game.InputManager.Actions.Run(timeElapsed);
         }
     }
 }

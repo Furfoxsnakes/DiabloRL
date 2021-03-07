@@ -41,9 +41,9 @@
     ]
   },
   "MagicResistance": {
-    "NORMAL": 2,
+    "NORMAL": -1,
     "NIGHTMARE": 0,
-    "HELL": 2
+    "HELL": -1
   },
   "FireResistance": {
     "NORMAL": 0,

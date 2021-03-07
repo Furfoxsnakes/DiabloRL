@@ -12,9 +12,9 @@ namespace DiabloRL.Models
         public Dictionary<Difficulties, int> ArmourClass;
         public Dictionary<Difficulties, int> ToHit;
         public Dictionary<Difficulties, int[]> DamageRange;
-        public Dictionary<Difficulties, ResistanceTypes> MagicResistance;
-        public Dictionary<Difficulties, ResistanceTypes> FireResistance;
-        public Dictionary<Difficulties, ResistanceTypes> LightningResistance;
+        public Dictionary<Difficulties, int> MagicResistance;
+        public Dictionary<Difficulties, int> FireResistance;
+        public Dictionary<Difficulties, int> LightningResistance;
         public Dictionary<Difficulties, int> BaseExperience;
     }
 }
