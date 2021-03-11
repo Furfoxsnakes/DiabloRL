@@ -40,9 +40,17 @@ namespace DiabloRL
             stats[StatTypes.MAGIC] = 10;
             stats[StatTypes.DEXTERITY] = 20;
             stats[StatTypes.VITALITY] = 25;
-            stats[StatTypes.LIFE] = 70;
-            stats[StatTypes.MANA] = 10;
+            stats[StatTypes.MAX_LIFE] = 70;
+            stats[StatTypes.LIFE] = stats[StatTypes.MAX_LIFE];
+            stats[StatTypes.MAX_MANA] = 10;
+            stats[StatTypes.MANA] = stats[StatTypes.MAX_MANA];
+            stats[StatTypes.LGOL] = 2;
+            stats[StatTypes.MGOL] = 1;
             AddGoRogueComponent(stats);
+
+            var playerLevel = new PlayerLevel();
+            AddGoRogueComponent(playerLevel);
+            playerLevel.Init(1);
         }
 
         public override bool ProcessKeyboard(Keyboard info)

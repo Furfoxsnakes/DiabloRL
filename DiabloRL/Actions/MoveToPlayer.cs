@@ -1,5 +1,7 @@
 ﻿using DiabloRL.Actors;
+using DiabloRL.Containers;
 using GoRogue;
+using SadConsole;
 using SadConsole.Actions;
 using SadConsole.Components.GoRogue;
 
@@ -16,7 +18,8 @@ namespace DiabloRL.Actions
             {
                 var target = (Parent.CurrentMap as DungeonMap)?.ControlledGameObject;
                 var action = new BasicMoveAndAttackAction(Parent, target, moveDirection);
-                Game.MapScreen.Actions.Push(action);
+                var playingScreen = Global.CurrentScreen as PlayingScreen;
+                playingScreen?.MapConsole.Actions.Push(action);
             }
         }
     }

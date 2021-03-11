@@ -1,7 +1,7 @@
 ﻿using System;
 using DiabloRL.Actors;
-using DiabloRL.Components;
 using DiabloRL.Enums;
+using DiabloRL.Systems;
 using GoRogue;
 using GoRogue.GameFramework;
 using GoRogue.MapGeneration;
@@ -13,27 +13,23 @@ using XnaRect = Microsoft.Xna.Framework.Rectangle;
 
 namespace DiabloRL
 {
-    internal class MapScreen : ContainerConsole
+    public class MapConsole : ScrollingConsole
     {
         public DungeonMap Map { get; }
         public GameFrameManager GameFrameManager { get; }
         public ActionStack Actions { get; }
 
-        public ScrollingConsole MapRenderer { get; }
-
         //Generate a map and display it.  Could just as easily pass it into
-        public MapScreen(int mapWidth, int mapHeight, int viewportWidth, int viewportHeight)
+        public MapConsole(int width, int height, int viewportWidth, int viewportHeight) : base(width, height)
         {
-            Map = GenerateDungeon(mapWidth, mapHeight);
+            Map = GenerateDungeon(100, 100);
 
             GameFrameManager = new GameFrameManager(Map);
             GameFrameManager.LogicFrameCompleted += OnLogicCompleted;
             Actions = new ActionStack();
 
-            // Get a console that's set up to render the map, and add it as a child of this container so it renders
-            MapRenderer = Map.CreateRenderer(new XnaRect(0, 0, viewportWidth, viewportHeight),
-                SadConsole.Global.FontDefault);
-            Children.Add(MapRenderer);
+            ViewPort = new XnaRect(0, 0, viewportWidth, viewportHeight);
+
             Map.ControlledGameObject.IsFocused =
                 true; // Set player to receive input, since in this example the player handles movement
 
@@ -44,7 +40,16 @@ namespace DiabloRL
 
             // Calculate initial FOV and center camera
             Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.DIAMOND);
-            MapRenderer.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
+            this.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
+
+            this.AddObserver(OnPlayerPerformedAction, InputManager.PlayerDidMoveNotification);
+        }
+
+        private void OnPlayerPerformedAction(object arg1, object arg2)
+        {
+            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.DIAMOND);
+            this.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
+            GameFrameManager.RunLogicFrame = true;
         }
 
         private void OnLogicCompleted(object? sender, EventArgs e)
@@ -56,11 +61,12 @@ namespace DiabloRL
         {
             if (e.OldObject != null)
                 e.OldObject.Moved -= Player_Moved;
+            
 
             ((BasicMap) s).ControlledGameObject.Moved += Player_Moved;
         }
 
-        private static DungeonMap GenerateDungeon(int width, int height)
+        private DungeonMap GenerateDungeon(int width, int height)
         {
             // Same size as screen, but we set up to center the camera on the player so expanding beyond this should work fine with no other changes.
             var map = new DungeonMap(width, height);
@@ -86,13 +92,14 @@ namespace DiabloRL
             map.ControlledGameObject = new Player(posToSpawn);
             map.AddEntity(map.ControlledGameObject);
 
+            map.ConfigureAsRenderer(this);
+
             return map;
         }
 
         private void Player_Moved(object sender, ItemMovedEventArgs<IGameObject> e)
         {
-            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.DIAMOND);
-            MapRenderer.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
+            
         }
 
         private static IGameObject SpawnTerrain(Coord position, bool mapGenValue)
@@ -110,7 +117,7 @@ namespace DiabloRL
         {
             base.Update(timeElapsed);
 
-            GameFrameManager.Update(MapRenderer, timeElapsed);
+            GameFrameManager.Update(this, timeElapsed);
             Actions.Run(timeElapsed);
         }
     }

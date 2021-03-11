@@ -16,7 +16,7 @@ namespace DiabloRL
         PLAYER
     }
 
-    internal class DungeonMap : BasicMap
+    public class DungeonMap : BasicMap
     {
         // Handles the changing of tile/entity visiblity as appropriate based on Map.FOV.
         public FOVVisibilityHandler FovVisibilityHandler { get; }

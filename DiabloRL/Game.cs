@@ -1,21 +1,27 @@
 ﻿using System;
+using DiabloRL.Containers;
 using DiabloRL.Systems;
+using SadConsole;
 
 namespace DiabloRL
 {
     internal class Game
     {
         private const int StartingWidth = 80;
-        private const int StartingHeight = 25;
+        private const int StartingHeight = 60;
 
-        public static MapScreen MapScreen { get; set; }
+        public static readonly int GameWidth = 80;
+        public static readonly int GameHeight = 60;
+
+        public static readonly int GameplayAreaHeight = 40;
+        public static readonly int GameUIHeight = StartingHeight - GameplayAreaHeight;
         public static InputManager InputManager { get; private set; }
         public static Random Random { get; private set; }
 
         private static void Main()
         {
             // Setup the engine and create the main window.
-            SadConsole.Game.Create(StartingWidth, StartingHeight);
+            SadConsole.Game.Create("Fonts/Buddy.font", StartingWidth, StartingHeight);
 
             // Hook the start event so we can add consoles to the system.
             SadConsole.Game.OnInitialize = Init;
@@ -27,12 +33,10 @@ namespace DiabloRL
 
         private static void Init()
         {
-            Random = new Random((int)System.DateTime.UtcNow.Ticks);
+            Random = new Random((int)DateTime.UtcNow.Ticks);
             InputManager = new InputManager();
             
-            // Here we pass the viewport and map size as the same, but the map could be larger and the camera would center on the player.
-            MapScreen = new MapScreen(StartingWidth, StartingHeight, StartingWidth, StartingHeight);
-            SadConsole.Global.CurrentScreen = MapScreen;
+            Global.CurrentScreen = new PlayingScreen();
         }
     }
 }

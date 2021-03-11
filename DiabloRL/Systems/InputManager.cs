@@ -1,12 +1,15 @@
 ﻿using DiabloRL.Actions;
 using DiabloRL.Actors;
+using DiabloRL.Containers;
 using GoRogue;
+using SadConsole;
 
 namespace DiabloRL.Systems
 {
     public class InputManager
-    {
+    {    
         public bool IsPlayerTurn = true;
+        public static string PlayerDidMoveNotification = "PlayerDidMove";
 
         public bool MovePlayer(Player player, Direction dir)
         {
@@ -19,7 +22,8 @@ namespace DiabloRL.Systems
             if (!didMove)
             {
                 var newPos = player.Position + dir;
-                var monster = Game.MapScreen.Map.GetEntity<Monster>(newPos);
+                // var monster = Game.MapConsole.Map.GetEntity<Monster>(newPos);
+                var monster = player.CurrentMap.GetEntity<Monster>(newPos);
 
                 if (monster == null)
                 {
@@ -28,11 +32,14 @@ namespace DiabloRL.Systems
                 else
                 {
                     var bumpAction = new BasicMoveAndAttackAction(player, monster, dir);
-                    Game.MapScreen.Actions.Push(bumpAction);
+                    var playingScreen = Global.CurrentScreen as PlayingScreen;
+                    playingScreen?.MapConsole.Actions.Push(bumpAction);
                 }
             }
 
-            Game.MapScreen.GameFrameManager.RunLogicFrame = true;
+            // Game.MapConsole.GameFrameManager.RunLogicFrame = true;
+            // _gameFrameManager.RunLogicFrame = true;
+            this.PostNotification(PlayerDidMoveNotification, player);
 
             return true;
         }

@@ -1,0 +1,10 @@
+﻿{
+  "Name": "Buddy",
+  "FilePath": "Buddy.png",
+  "GlyphHeight": 10,
+  "GlyphPadding": 0,
+  "GlyphWidth": 10,
+  "SolidGlyphIndex": 219,
+  "Columns": 16,
+  "IsSadExtended": false
+}

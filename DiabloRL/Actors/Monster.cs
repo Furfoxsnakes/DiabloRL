@@ -119,7 +119,10 @@ namespace DiabloRL.Actors
         protected override void Die()
         {
             base.Die();
-            (CurrentMap as DungeonMap)?.RemoveMonster(this);
+            var dungeonMap = CurrentMap as DungeonMap;
+            dungeonMap?.RemoveMonster(this);
+            var playerLevel = dungeonMap.ControlledGameObject.GetGoRogueComponent<PlayerLevel>();
+            playerLevel.Exp += Stats[MonsterStatTypes.BASE_EXP];
         }
     }
 }
