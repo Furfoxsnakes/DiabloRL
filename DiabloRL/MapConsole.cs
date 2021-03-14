@@ -29,6 +29,7 @@ namespace DiabloRL
             Actions = new ActionStack();
 
             ViewPort = new XnaRect(0, 0, viewportWidth, viewportHeight);
+            Map.ConfigureAsRenderer(this);
 
             Map.ControlledGameObject.IsFocused =
                 true; // Set player to receive input, since in this example the player handles movement
@@ -39,7 +40,7 @@ namespace DiabloRL
             Map.ControlledGameObjectChanged += ControlledGameObjectChanged;
 
             // Calculate initial FOV and center camera
-            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.DIAMOND);
+            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.CIRCLE);
             this.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
 
             this.AddObserver(OnPlayerPerformedAction, InputManager.PlayerDidMoveNotification);
@@ -47,7 +48,7 @@ namespace DiabloRL
 
         private void OnPlayerPerformedAction(object arg1, object arg2)
         {
-            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.DIAMOND);
+            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.CIRCLE);
             this.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
             GameFrameManager.RunLogicFrame = true;
         }
@@ -66,7 +67,7 @@ namespace DiabloRL
             ((BasicMap) s).ControlledGameObject.Moved += Player_Moved;
         }
 
-        private DungeonMap GenerateDungeon(int width, int height)
+        private static DungeonMap GenerateDungeon(int width, int height)
         {
             // Same size as screen, but we set up to center the camera on the player so expanding beyond this should work fine with no other changes.
             var map = new DungeonMap(width, height);
@@ -91,8 +92,6 @@ namespace DiabloRL
             posToSpawn = map.WalkabilityView.RandomPosition(true);
             map.ControlledGameObject = new Player(posToSpawn);
             map.AddEntity(map.ControlledGameObject);
-
-            map.ConfigureAsRenderer(this);
 
             return map;
         }
