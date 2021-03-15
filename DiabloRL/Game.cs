@@ -18,10 +18,13 @@ namespace DiabloRL
         public static InputManager InputManager { get; private set; }
         public static Random Random { get; private set; }
 
+        public static PlayingScreen PlayingScreen => Global.CurrentScreen as PlayingScreen;
+
         private static void Main()
         {
             // Setup the engine and create the main window.
             SadConsole.Game.Create("Fonts/Buddy.font", StartingWidth, StartingHeight);
+            SadConsole.Game.Instance.Window.AllowUserResizing = true;
 
             // Hook the start event so we can add consoles to the system.
             SadConsole.Game.OnInitialize = Init;

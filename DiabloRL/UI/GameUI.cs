@@ -4,6 +4,7 @@ using DiabloRL.Enums;
 using Microsoft.Xna.Framework;
 using SadConsole;
 using SadConsole.Controls;
+using SadConsole.Input;
 using SadConsole.Themes;
 
 namespace DiabloRL.UI
@@ -34,6 +35,10 @@ namespace DiabloRL.UI
 
         #endregion
 
+        private PotionsBar _potionsBar;
+        private InformationConsole _informationConsole;
+        private MenuWindow _menuWindow;
+
         public GameUI(int width, int height) : base(width, height)
         {
             Position = new Point(0, Game.GameHeight - height);
@@ -46,18 +51,31 @@ namespace DiabloRL.UI
             colors.RebuildAppearances();
             ThemeColors = colors;
 
+            CreateInformationConsole();
+            CreatePotionsBar();
             CreateButtons();
             CreateHealthAndManaLabels();
 
             this.AddObserver(OnPlayerHealthChanged, Stats.DidChangeNotification(StatTypes.MAX_LIFE));
             this.AddObserver(OnPlayerHealthChanged, Stats.DidChangeNotification(StatTypes.LIFE));
+            
+            this.AddObserver(OnPlayerManaChanged, Stats.DidChangeNotification(StatTypes.MAX_MANA));
+            this.AddObserver(OnPlayerManaChanged, Stats.DidChangeNotification(StatTypes.MANA));
+
+        }
+
+        private void OnPlayerManaChanged(object sender, object args)
+        {
+            var stats = sender as Stats;
+            _manaLabel.DisplayText = $"{stats?[StatTypes.MANA]}/{stats?[StatTypes.MAX_MANA]}";
+            IsDirty = true;
         }
 
         private void OnPlayerHealthChanged(object sender, object args)
         {
             var stats = sender as Stats;
             _lifeLabel.DisplayText = $"{stats?[StatTypes.LIFE]}/{stats?[StatTypes.MAX_LIFE]}";
-            Draw(TimeSpan.MinValue);
+            IsDirty = true;
         }
 
         private void CreateButtons()
@@ -102,7 +120,13 @@ namespace DiabloRL.UI
                 Position = new Point(Width - _buttonWidth, 5),
                 Text = "MENU"
             };
+            _menuButton.MouseButtonClicked += OnMenuButtonClicked;
             Add(_menuButton);
+        }
+
+        private void OnMenuButtonClicked(object? sender, MouseEventArgs e)
+        {
+            Game.PlayingScreen.MenuWindow.Show();
         }
 
         private void CreateHealthAndManaLabels()
@@ -122,6 +146,32 @@ namespace DiabloRL.UI
             };
             Add(_lifeLabel);
 
+            var manaTitle = new Label(7)
+            {
+                DisplayText = "MANA",
+                Alignment = HorizontalAlignment.Center,
+                Position = new Point(Width - 19, 1)
+            };
+            Add(manaTitle);
+
+            _manaLabel = new Label(7)
+            {
+                Alignment = HorizontalAlignment.Center,
+                Position = new Point(Width - 19, 3)
+            };
+            Add(_manaLabel);
+        }
+
+        private void CreatePotionsBar()
+        {
+            _potionsBar = new PotionsBar(new Point(32, 1));
+            Children.Add(_potionsBar);
+        }
+
+        private void CreateInformationConsole()
+        {
+            _informationConsole = new InformationConsole(new Point(20, 4));
+            Children.Add(_informationConsole);
         }
     }
 }
