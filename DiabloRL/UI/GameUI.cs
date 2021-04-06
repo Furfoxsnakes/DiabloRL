@@ -66,15 +66,13 @@ namespace DiabloRL.UI
 
         private void OnPlayerManaChanged(object sender, object args)
         {
-            var stats = sender as Stats;
-            _manaLabel.DisplayText = $"{stats?[StatTypes.MANA]}/{stats?[StatTypes.MAX_MANA]}";
+            _manaLabel.DisplayText = $"{Game.Player.Stats?[StatTypes.MANA]}/{Game.Player.Stats?[StatTypes.MAX_MANA]}";
             IsDirty = true;
         }
 
         private void OnPlayerHealthChanged(object sender, object args)
         {
-            var stats = sender as Stats;
-            _lifeLabel.DisplayText = $"{stats?[StatTypes.LIFE]}/{stats?[StatTypes.MAX_LIFE]}";
+            _lifeLabel.DisplayText = $"{Game.Player.Stats[StatTypes.LIFE]}/{Game.Player.MaxLife}";
             IsDirty = true;
         }
 
@@ -106,6 +104,7 @@ namespace DiabloRL.UI
                 Position = new Point(Width - _buttonWidth, 1),
                 Text = "INV"
             };
+            _inventoryButton.MouseButtonClicked += OnInventoryButtonClicked;
             Add(_inventoryButton);
 
             _spellsButton = new Button(_buttonWidth, 1)
@@ -124,9 +123,21 @@ namespace DiabloRL.UI
             Add(_menuButton);
         }
 
+        private void OnInventoryButtonClicked(object? sender, MouseEventArgs e)
+        {
+            if (!Game.PlayingScreen.InventoryWindow.IsVisible)
+                Game.PlayingScreen.InventoryWindow.Show();
+            else
+                Game.PlayingScreen.InventoryWindow.Hide();
+        }
+
         private void OnMenuButtonClicked(object? sender, MouseEventArgs e)
         {
-            Game.PlayingScreen.MenuWindow.Show();
+            if (!Game.PlayingScreen.MenuWindow.IsVisible)
+                Game.PlayingScreen.MenuWindow.Show();
+            else
+                Game.PlayingScreen.MenuWindow.Hide();
+
         }
 
         private void CreateHealthAndManaLabels()
@@ -142,6 +153,7 @@ namespace DiabloRL.UI
             _lifeLabel = new Label(7)
             {
                 Alignment = HorizontalAlignment.Center,
+                DisplayText = $"{Game.Player.Stats[StatTypes.LIFE]}/{Game.Player.MaxLife}",
                 Position = new Point(12, 3)
             };
             Add(_lifeLabel);
@@ -157,6 +169,7 @@ namespace DiabloRL.UI
             _manaLabel = new Label(7)
             {
                 Alignment = HorizontalAlignment.Center,
+                DisplayText = $"{Game.Player.Stats?[StatTypes.MANA]}/{Game.Player.Stats?[StatTypes.MAX_MANA]}",
                 Position = new Point(Width - 19, 3)
             };
             Add(_manaLabel);

@@ -13,6 +13,8 @@
         MANA,
         MAX_MANA,
         ARMOUR,
+        MINDMG,
+        MAXDMG,
         LGOL,   // Life Gain On Levelup
         MGOL,   // Mana Gain On Levelup
         Count

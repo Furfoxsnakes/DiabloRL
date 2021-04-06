@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using DiabloRL.Actors;
 using DiabloRL.Components;
 using DiabloRL.Enums;
+using DiabloRL.Models.Equipment;
+using DiabloRL.Models.Items;
+using DiabloRL.Systems;
 using GoRogue;
 using GoRogue.DiceNotation;
 using Microsoft.Xna.Framework;
@@ -24,10 +27,14 @@ namespace DiabloRL
         };
 
         public int FOVRadius;
+        
         public Stats Stats => GetGoRogueComponent<Stats>();
-        public int MinDamage = 2;
-        public int MaxDamage = 4;
-        public int Armour => Stats[StatTypes.DEXTERITY] / 5;
+        public int BaseDamage => Stats[StatTypes.STRENGTH] * GetGoRogueComponent<PlayerLevel>().Level / 100;
+        public int MinDamage => Stats[StatTypes.MINDMG] + GetEquipmemtModifiersForStatType(StatTypes.MINDMG);
+        public int MaxDamage => Stats[StatTypes.MAXDMG] + GetEquipmemtModifiersForStatType(StatTypes.MAXDMG);
+        public int Armour => Stats[StatTypes.DEXTERITY] / 5 + GetEquipmemtModifiersForStatType(StatTypes.ARMOUR);
+        public int MaxLife => Stats[StatTypes.MAX_LIFE] + GetEquipmemtModifiersForStatType(StatTypes.MAX_LIFE);
+        public int Strength => Stats[StatTypes.STRENGTH] + GetEquipmemtModifiersForStatType(StatTypes.STRENGTH);
 
         public Player(Coord position)
             : base(Color.White, Color.Black, '@', "Player", position, (int) MapLayer.PLAYER, isWalkable: false,
@@ -41,12 +48,21 @@ namespace DiabloRL
             stats[StatTypes.DEXTERITY] = 20;
             stats[StatTypes.VITALITY] = 25;
             stats[StatTypes.MAX_LIFE] = 70;
-            stats[StatTypes.LIFE] = stats[StatTypes.MAX_LIFE];
+            stats[StatTypes.LIFE] = 50;
             stats[StatTypes.MAX_MANA] = 10;
-            stats[StatTypes.MANA] = stats[StatTypes.MAX_MANA];
+            stats[StatTypes.MANA] = 0;
             stats[StatTypes.LGOL] = 2;
             stats[StatTypes.MGOL] = 1;
             AddGoRogueComponent(stats);
+
+            var playerInventory = new Inventory();
+            AddGoRogueComponent(playerInventory);
+            playerInventory.AddItem(new HealthPotion(10));
+            playerInventory.AddItem(new ManaPotion(5));
+            playerInventory.AddItem(new Cap());
+            playerInventory.AddItem(new SkullCap());
+            playerInventory.AddItem(new SmallAxe());
+            playerInventory.AddItem(new SmallAxe());
 
             var playerLevel = new PlayerLevel();
             AddGoRogueComponent(playerLevel);
@@ -92,8 +108,6 @@ namespace DiabloRL
                 Die();
                 return;
             }
-
-            System.Console.WriteLine($"{Name} has {Stats[StatTypes.LIFE]} life remaining");
         }
 
         protected override bool ResolveToHit(Actor defender)
@@ -107,7 +121,9 @@ namespace DiabloRL
         protected override int ResolveDamage(Actor defender)
         {
             var damage = Game.Random.Next(MinDamage, MaxDamage + 1);
-            
+            // Minimum of 1 damage
+            damage = Math.Max(1, damage);
+
             // double damage on critical hit
             if (Dice.Roll("1d100") < Stats[StatTypes.LEVEL])
                 damage *= 2;
@@ -115,6 +131,23 @@ namespace DiabloRL
             // other calculations in the future
 
             return damage;
+        }
+
+        private int GetEquipmemtModifiersForStatType(StatTypes type)
+        {
+            var returnValue = 0;
+
+            var inventory = GetGoRogueComponent<Inventory>();
+
+            foreach (var (key,value) in inventory.EquippedItems)
+            {
+                if (value == null) continue;
+                
+                if (value.AffectedStats.ContainsKey(type))
+                    returnValue += value.AffectedStats[type];
+            }
+
+            return returnValue;
         }
     }
 }

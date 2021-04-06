@@ -11,8 +11,7 @@ namespace DiabloRL.Actions
     {
         public override void ProcessGameFrame()
         {
-            var player = Parent.CurrentMap.ControlledGameObject;
-            var moveDirection = Direction.GetDirection(Parent.Position, player.Position);
+            var moveDirection = Direction.GetDirection(Parent.Position, Game.Player.Position);
             var didMove = Parent.MoveIn(moveDirection);
             if (!didMove)
             {

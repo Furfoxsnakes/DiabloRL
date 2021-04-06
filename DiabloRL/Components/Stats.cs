@@ -17,6 +17,24 @@ namespace DiabloRL.Components
         
         private int[] _data;
 
+        /// <summary>
+        /// Wrapper for LIFE stat to not allow it to be more than the MAX_LIFE stat
+        /// </summary>
+        public int Life
+        {
+            get => _data[(int) StatTypes.LIFE];
+            set => _data[(int) StatTypes.LIFE] = Math.Min(Life + value, _data[(int) StatTypes.MAX_LIFE]);
+        }
+        
+        /// <summary>
+        /// Wrapper for MANA stat to not allow it to be more than the MAX_MANA stat
+        /// </summary>
+        public int Mana
+        {
+            get => _data[(int) StatTypes.MANA];
+            set => _data[(int) StatTypes.MANA] = Math.Min(Mana + value, _data[(int) StatTypes.MAX_MANA]);
+        }
+
         private static Dictionary<StatTypes, string> _didChangeNotifications = new Dictionary<StatTypes, string>();
 
         public Stats()
@@ -33,7 +51,7 @@ namespace DiabloRL.Components
             _data[(int)type] = value;
 
             if (doNotifiy)
-                this.PostNotification(DidChangeNotification(type), oldValue);
+                this.PostNotification(DidChangeNotification(type), this);
         }
 
         public static string DidChangeNotification(StatTypes type)

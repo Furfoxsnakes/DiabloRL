@@ -1,5 +1,6 @@
 ﻿using System;
 using DiabloRL.Actors;
+using DiabloRL.Common.Cartography;
 using DiabloRL.Enums;
 using DiabloRL.Systems;
 using GoRogue;
@@ -31,40 +32,33 @@ namespace DiabloRL
             ViewPort = new XnaRect(0, 0, viewportWidth, viewportHeight);
             Map.ConfigureAsRenderer(this);
 
+            Map.ControlledGameObject = Game.Player;
             Map.ControlledGameObject.IsFocused =
                 true; // Set player to receive input, since in this example the player handles movement
+            // Game.Player.IsFocused = true;
 
             // Set up to recalculate FOV and set camera position appropriately when the player moves.  Also make sure we hook the new
             // Player if that object is reassigned.
-            Map.ControlledGameObject.Moved += Player_Moved;
-            Map.ControlledGameObjectChanged += ControlledGameObjectChanged;
+            // Map.ControlledGameObject.Moved += Player_Moved;
+            // Map.ControlledGameObjectChanged += ControlledGameObjectChanged;
 
             // Calculate initial FOV and center camera
-            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.CIRCLE);
-            this.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
+            Map.CalculateFOV(Game.Player.Position, Game.Player.FOVRadius, Radius.CIRCLE);
+            this.CenterViewPortOnPoint(Game.Player.Position);
 
             this.AddObserver(OnPlayerPerformedAction, InputManager.PlayerDidMoveNotification);
         }
 
         private void OnPlayerPerformedAction(object arg1, object arg2)
         {
-            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.CIRCLE);
-            this.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
+            Map.CalculateFOV(Game.Player.Position, Game.Player.FOVRadius, Radius.CIRCLE);
+            this.CenterViewPortOnPoint(Game.Player.Position);
             GameFrameManager.RunLogicFrame = true;
         }
 
         private void OnLogicCompleted(object? sender, EventArgs e)
         {
             Game.InputManager.IsPlayerTurn = true;
-        }
-
-        private void ControlledGameObjectChanged(object s, ControlledGameObjectChangedArgs e)
-        {
-            if (e.OldObject != null)
-                e.OldObject.Moved -= Player_Moved;
-            
-
-            ((BasicMap) s).ControlledGameObject.Moved += Player_Moved;
         }
 
         private static DungeonMap GenerateDungeon(int width, int height)
@@ -76,7 +70,9 @@ namespace DiabloRL
             var tempMap = new ArrayMap<bool>(map.Width, map.Height);
             // QuickGenerators.GenerateDungeonMazeMap(tempMap, minRooms: 10, maxRooms: 20, roomMinSize: 5,
             //     roomMaxSize: 11);
-            QuickGenerators.GenerateRectangleMap(tempMap);
+            // QuickGenerators.GenerateRectangleMap(tempMap);
+            // MapGenerators.GenerateBSPDungeon(tempMap);
+            QuickGenerators.GenerateRandomRoomsMap(tempMap, 20, 7, 12);
             map.ApplyTerrainOverlay(tempMap, SpawnTerrain);
 
             Coord posToSpawn;
@@ -90,15 +86,10 @@ namespace DiabloRL
 
             // Spawn player
             posToSpawn = map.WalkabilityView.RandomPosition(true);
-            map.ControlledGameObject = new Player(posToSpawn);
-            map.AddEntity(map.ControlledGameObject);
+            Game.Player.Position = posToSpawn;
+            map.AddEntity(Game.Player);
 
             return map;
-        }
-
-        private void Player_Moved(object sender, ItemMovedEventArgs<IGameObject> e)
-        {
-            
         }
 
         private static IGameObject SpawnTerrain(Coord position, bool mapGenValue)

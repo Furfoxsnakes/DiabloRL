@@ -1,4 +1,5 @@
 ﻿using System;
+using DiabloRL.Components;
 using Microsoft.Xna.Framework;
 using SadConsole;
 using SadConsole.Controls;
@@ -18,7 +19,9 @@ namespace DiabloRL.UI
             CanDrag = true;
             CloseOnEscKey = true;
 
-            _closeButton = new Button(20)
+            Components.Add(new BorderComponent(ConnectedLineThin, Color.White, Color.Black));
+
+            _closeButton = new Button(Width)
             {
                 TextAlignment = HorizontalAlignment.Center,
                 Position = new Point(0, 3),

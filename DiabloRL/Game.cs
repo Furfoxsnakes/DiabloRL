@@ -15,9 +15,10 @@ namespace DiabloRL
 
         public static readonly int GameplayAreaHeight = 40;
         public static readonly int GameUIHeight = StartingHeight - GameplayAreaHeight;
+
+        public static Player Player;
         public static InputManager InputManager { get; private set; }
         public static Random Random { get; private set; }
-
         public static PlayingScreen PlayingScreen => Global.CurrentScreen as PlayingScreen;
 
         private static void Main()

@@ -13,7 +13,7 @@ namespace DiabloRL.Actors
         public MonsterTypes Type;
         private MonsterData _data;
 
-        public Zombie(Coord position) : base(Color.DarkKhaki, Color.Black, 'Z', name: "Zombie", position)
+        public Zombie(Coord position) : base(Color.Firebrick, Color.Black, 'Z', name: "Zombie", position)
         {
             Type = MonsterTypes.UNDEAD;
         }
