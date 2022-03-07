@@ -20,13 +20,13 @@ namespace DiabloRL.Actions.Basic
 
             if (!GameEntity.CanMoveIn(_direction))
             {
-                var target = Map.GetEntityAt<RogueLikeEntity>(newPos);
-                System.Console.WriteLine(target);
+                var target = Map.GetEntityAt<GameEntity>(newPos);
                 if (target == null)
                     return Fail($"{GameEntity.Name} cannot move from {GameEntity.Position} to {newPos}");
                 
                 // otherwise attack the target
-                return Fail($"{GameEntity.Name} attacks {target.Name}");
+                return new AttackAction(GameEntity, target);
+                // return Fail($"{GameEntity.Name} attacks {target.Name}");
             }
 
             // Entity can move to the new position

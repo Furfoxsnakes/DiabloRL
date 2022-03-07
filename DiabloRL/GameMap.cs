@@ -22,7 +22,7 @@ namespace DiabloRL
         // CUSTOMIZATION: Change the distance from Distance.Chebyshev to whatever is desired for your game.  By default,
         // this will affect the FOV shape as well as the distance calculation used for AStar pathfinding on the Map.
         public GameMap(int width, int height, DefaultRendererParams? defaultRendererParams)
-            : base(width, height, defaultRendererParams, Enum.GetValues<Layer>().Length - 1, Distance.Euclidean)
+            : base(width, height, defaultRendererParams, Enum.GetValues<Layer>().Length - 1, Distance.Chebyshev)
         {
         }
     }

@@ -1,5 +1,6 @@
 ﻿using DiabloRL.AI;
 using DiabloRL.Behaviors;
+using DiabloRL.Components.Stats;
 using DiabloRL.Entities;
 using SadRogue.Integration;
 using SadRogue.Integration.FieldOfView.Memory;
@@ -40,6 +41,19 @@ namespace DiabloRL
             };
             
             player.SetBehavior(new OneShotBehavior(null));
+            
+            // add some stats
+            // assuming Warrior stats for now
+            
+            player.AllComponents.Add(new Strength(30));
+            player.AllComponents.Add(new Magic(10));
+            player.AllComponents.Add(new Dexterity(20));
+            player.AllComponents.Add(new Vitality(25));
+            player.AllComponents.Add(new Life(2, 2, 2, 18, 2));
+            player.AllComponents.Add(new Mana(1, 1, 1, -1, 1));
+
+            // init stats
+            player.Life.Current = player.Life.Max;
 
             return player;
         }
@@ -52,6 +66,12 @@ namespace DiabloRL
             };
             
             enemy.SetBehavior(new MonsterBehavior(enemy));
+            
+            // add some stats
+            enemy.AllComponents.Add(new Life(30));
+            
+            // init stats
+            enemy.Life.Current = enemy.Life.Max;
 
             return enemy;
         }

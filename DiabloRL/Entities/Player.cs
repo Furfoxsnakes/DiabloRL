@@ -2,6 +2,7 @@
 using DiabloRL.Actions.Basic;
 using DiabloRL.Behaviors;
 using DiabloRL.Components;
+using DiabloRL.Components.Stats;
 using GoRogue.Components;
 using SadRogue.Integration;
 using SadRogue.Integration.Keybindings;
@@ -11,6 +12,9 @@ namespace DiabloRL.Entities
 {
     public class Player : GameEntity
     {
+        public Vitality Vitality => AllComponents.GetFirstOrDefault<Vitality>();
+        public Mana Mana => AllComponents.GetFirstOrDefault<Mana>();
+        
         public Player() : base(foreground: Color.Yellow, background: Color.Black, glyph: '@', walkable: false, transparent: false, 1)
         {
             // Add component for controlling player movement via keyboard.  Other (non-movement) keybindings can be
@@ -22,6 +26,8 @@ namespace DiabloRL.Entities
 
             // Add component for updating map's player FOV as they move
             AllComponents.Add(new PlayerFOVController());
+            
+            
         }
     }
 }
