@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="SadConsole.GoRogueHelpers" Version="1.0.1" />
         <PackageReference Include="SadConsole.Host.MonoGame" Version="9.1.1" />
         <PackageReference Include="TheSadRogue.Integration" Version="1.0.0-alpha02" />
     </ItemGroup>

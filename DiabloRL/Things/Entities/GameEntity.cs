@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using DiabloRL.Behaviors;
 using DiabloRL.Components.Stats;
+using DiabloRL.Things;
 using GoRogue.Components;
 using SadRogue.Integration;
 using SadRogue.Primitives;
@@ -9,7 +10,7 @@ using Action = DiabloRL.Actions.Action;
 
 namespace DiabloRL.Entities
 {
-    public class GameEntity : RogueLikeEntity
+    public abstract class GameEntity : RogueLikeEntity
     {
 
         public Behavior Behavior => _behavior;
@@ -33,10 +34,36 @@ namespace DiabloRL.Entities
             _behavior = behavior ?? throw new ArgumentNullException(nameof(behavior));
         }
 
-        public virtual void TakeHit(int damage)
+        public virtual void TakeHit(Action action, Hit hit)
         {
-            Life.Current -= damage;
+            // attempt to dodge the attack
+            
+            // apply the damage of the hit
+            hit.SetDamage(ReceiveDamage(hit.Attack));
+
+            if (hit.Damage > 0)
+            {
+                action.Log($"{hit.Attacker.Name} hits {Name} for {hit.Damage} damage.");
+            }
+            else
+            {
+                // tell why no damage was done
+            }
         }
+
+        public virtual int ReceiveDamage(Attack attack)
+        {
+            float amount = attack.Roll();
+            
+            System.Console.WriteLine(amount);
+            
+            // apply modifiers
+            var appliedDamage = (int)Math.Ceiling(amount);
+            Life.Current -= appliedDamage;
+            return appliedDamage;
+        }
+
+        public abstract Attack GetAttack(GameEntity defender);
 
         private Behavior _behavior;
     }

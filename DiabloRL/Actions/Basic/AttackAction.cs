@@ -1,4 +1,6 @@
 ﻿using DiabloRL.Entities;
+using DiabloRL.Things;
+using SadRogue.Primitives;
 
 namespace DiabloRL.Actions.Basic;
 
@@ -12,10 +14,17 @@ public class AttackAction : Action
     protected override ActionResult OnProcess()
     {
         if (GameEntity is Enemy && _defender is Enemy)
-            return Fail($"Enemies can't attack each other, ya dingus.");
+            // Monsters cannot damage each other
+            // return Fail($"Enemies can't attack each other, ya dingus.");
+            return ActionResult.Fail;
 
-        _defender.TakeHit(1);
-        Log($"{_defender.Name} now has {_defender.Life.Current}/{_defender.Life.Max} life.");
+        var attack = GameEntity.GetAttack(_defender);
+        
+        // send the hit to the defender
+        var direction = Direction.GetDirection(_defender.Position, GameEntity.Position);
+        var hit = new Hit(GameEntity, attack, true, direction);
+        _defender.TakeHit(this,hit);
+        
         return ActionResult.Done;
     }
 

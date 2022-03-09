@@ -60,11 +60,8 @@ namespace DiabloRL
 
         public static Enemy Enemy()
         {
-            var enemy = new Enemy(Color.Red, Color.Black, 'g')
-            {
-                Name = "Goblin"
-            };
-            
+            var enemy = new Goblin();
+
             enemy.SetBehavior(new MonsterBehavior(enemy));
             
             // add some stats
