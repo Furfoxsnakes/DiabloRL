@@ -24,6 +24,7 @@ namespace DiabloRL
         public GameMap(int width, int height, DefaultRendererParams? defaultRendererParams)
             : base(width, height, defaultRendererParams, Enum.GetValues<Layer>().Length - 1, Distance.Chebyshev)
         {
+            
         }
     }
 }

@@ -21,9 +21,14 @@ namespace DiabloRL
     {
         protected override void MotionHandler(Direction direction)
         {
+            // GoRogue action system
+            // Game.GameScreen.ActionStack.PushAndRun(new GoRogueWalkAction((GameEntity) Parent, Parent.Position + direction));
+            // Game.GameScreen.GameFrameManager.RunLogicFrame = true;
+
+            // Custom action system
             var player = Parent as Player;
             player.SetBehavior(new OneShotBehavior(new WalkAction(player, direction)));
-
+            
             if (!Game.GameScreen.Player.Behavior.NeedsUserInput)
                 Game.GameScreen.Process();
         }

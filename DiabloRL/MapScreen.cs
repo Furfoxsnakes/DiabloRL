@@ -5,6 +5,7 @@ using DiabloRL.Behaviors;
 using DiabloRL.Entities;
 using DiabloRL.Processing;
 using SadConsole;
+using SadConsole.Actions;
 using SadRogue.Integration;
 using SadRogue.Primitives.GridViews;
 using Action = DiabloRL.Actions.Action;
@@ -17,6 +18,8 @@ namespace DiabloRL
         public readonly GameMap Map;
         public readonly GameEntity Player;
         public readonly MessageLogConsole MessageLog;
+        public readonly DiabloRL.Actions.ActionStack ActionStack;
+        public readonly DiabloRL.Processing.GameFrameManager GameFrameManager;
 
         const int MessageLogHeight = 5;
 
@@ -24,6 +27,10 @@ namespace DiabloRL
         {
             // Record the map we're rendering
             Map = map;
+
+            // spin up the action stack
+            ActionStack = new DiabloRL.Actions.ActionStack();
+            GameFrameManager = new Processing.GameFrameManager(Map, this);
 
             // Create a renderer for the map, specifying viewport size.  The value in DefaultRenderer is automatically
             // managed by the map, and renders whenever the map is the active screen.
@@ -61,14 +68,17 @@ namespace DiabloRL
 
         public GameResult Process()
         {
+            
+            // ActionStack.Run(default);
+            
             // create enumerator if not already done so
             if (_processEnumerator == null)
                 _processEnumerator = CreateProcessEnumerable().GetEnumerator();
-
+            
             if (!_processEnumerator.MoveNext())
                 // if there's no more results then the game must be over
                 return new GameResult(GameResultFlags.GameOver | GameResultFlags.NeedsPause);
-
+            
             // otherwise send the GameResult of the current turn
             return _processEnumerator.Current;
         }
@@ -82,7 +92,7 @@ namespace DiabloRL
                     // Don't continue if the entity's (most likely the player) behavior requires an action
                     while (entity.Behavior.NeedsUserInput)
                         yield return new GameResult(GameResultFlags.NeedsUserInput, entity);
-
+        
                     foreach (var action in entity.TakeTurn())
                     {
                         foreach (var result in ProcessAction(action))
@@ -99,25 +109,32 @@ namespace DiabloRL
         {
             var actions = new Queue<Action>();
             actions.Enqueue(actionToProcess);
-
+        
             while (actions.Count > 0)
             {
                 var action = actions.Peek();
-
+        
                 var result = action.Process(actions);
                 
                 // cascade through alternate actions if possible
                 while (result.Alternate != null)
                     result = result.Alternate.Process(actions);
-
+        
                 if (result.IsDone)
                     actions.Dequeue();
-
+        
                 if (result.NeedsPause)
                     yield return new GameResult(GameResultFlags.NeedsPause);
                 else if (result.NeedsCheckForCancel)
                     yield return new GameResult(GameResultFlags.CheckForCancel);
             }
+        }
+
+        public override void Update(TimeSpan delta)
+        {
+            base.Update(delta);
+            GameFrameManager.Update(this, delta);
+            ActionStack.Run(delta);
         }
 
         private IEnumerator<GameResult> _processEnumerator;

@@ -63,6 +63,7 @@ namespace DiabloRL
             var enemy = new Goblin();
 
             enemy.SetBehavior(new MonsterBehavior(enemy));
+            // enemy.GoRogueComponents.Add(new GoRogueMonsterBehaviour(10, usesEnergy:false));
             
             // add some stats
             enemy.AllComponents.Add(new Life(30));
