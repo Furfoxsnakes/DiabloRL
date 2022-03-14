@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DiabloRL.Actions;
 using DiabloRL.Behaviors;
 using DiabloRL.Entities;
 using DiabloRL.Processing;
+using DiabloRL.Things;
 using SadConsole;
-using SadConsole.Actions;
+using SadConsole.Entities;
 using SadRogue.Integration;
 using SadRogue.Primitives.GridViews;
 using Action = DiabloRL.Actions.Action;
@@ -18,8 +20,6 @@ namespace DiabloRL
         public readonly GameMap Map;
         public readonly GameEntity Player;
         public readonly MessageLogConsole MessageLog;
-        public readonly DiabloRL.Actions.ActionStack ActionStack;
-        public readonly DiabloRL.Processing.GameFrameManager GameFrameManager;
 
         const int MessageLogHeight = 5;
 
@@ -27,10 +27,6 @@ namespace DiabloRL
         {
             // Record the map we're rendering
             Map = map;
-
-            // spin up the action stack
-            ActionStack = new DiabloRL.Actions.ActionStack();
-            GameFrameManager = new Processing.GameFrameManager(Map, this);
 
             // Create a renderer for the map, specifying viewport size.  The value in DefaultRenderer is automatically
             // managed by the map, and renders whenever the map is the active screen.
@@ -88,19 +84,25 @@ namespace DiabloRL
             while (true)
             {
                 foreach (GameEntity entity in Map.Entities.Items)
+                // for (var entityIndex = 0; entityIndex < Map.Entities.Count; entityIndex++)
                 {
-                    // Don't continue if the entity's (most likely the player) behavior requires an action
-                    while (entity.Behavior.NeedsUserInput)
-                        yield return new GameResult(GameResultFlags.NeedsUserInput, entity);
-        
-                    foreach (var action in entity.TakeTurn())
+                    Console.WriteLine($"{entity.Name} : {entity.AllComponents.GetFirst<Energy>().Curent}");
+                    var energy = entity.AllComponents.GetFirstOrDefault<Energy>();
+                    while (energy.HasEnergy)
                     {
-                        foreach (var result in ProcessAction(action))
+                        // Don't continue if the entity's (most likely the player) behavior requires an action
+                        while (entity.Behavior.NeedsUserInput)
+                            yield return new GameResult(GameResultFlags.NeedsUserInput, entity);
+        
+                        foreach (var action in entity.TakeTurn())
                         {
-                            Game.GameScreen.MessageLog.AddMessage(result.Entity.Name);
-                            yield return result;
+                            foreach (var result in ProcessAction(action))
+                                yield return result;
                         }
                     }
+                    
+                    // round has finished so give everything some energy
+                    energy.Gain();
                 }
             }
         }
@@ -113,28 +115,31 @@ namespace DiabloRL
             while (actions.Count > 0)
             {
                 var action = actions.Peek();
+                
+                Console.WriteLine(action);
         
                 var result = action.Process(actions);
                 
                 // cascade through alternate actions if possible
                 while (result.Alternate != null)
                     result = result.Alternate.Process(actions);
-        
+                
                 if (result.IsDone)
                     actions.Dequeue();
-        
+                
+                // Bandaid fix
+                // monster should be deciding what to do if an action failed
+                if (result.IsFlagSet(ActionResultFlags.Failed))
+                    action.AfterSuccess();
+                
+                if (result.Success)
+                    action.AfterSuccess();
+
                 if (result.NeedsPause)
                     yield return new GameResult(GameResultFlags.NeedsPause);
                 else if (result.NeedsCheckForCancel)
                     yield return new GameResult(GameResultFlags.CheckForCancel);
             }
-        }
-
-        public override void Update(TimeSpan delta)
-        {
-            base.Update(delta);
-            GameFrameManager.Update(this, delta);
-            ActionStack.Run(delta);
         }
 
         private IEnumerator<GameResult> _processEnumerator;

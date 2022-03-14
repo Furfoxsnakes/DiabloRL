@@ -25,6 +25,7 @@ namespace DiabloRL.Entities
         public IEnumerable<Action> TakeTurn()
         {
             var turnAction = _behavior.NextAction();
+            turnAction.MarkAsConsumesEnergy();
 
             yield return turnAction;
         }

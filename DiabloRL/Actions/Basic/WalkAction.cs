@@ -1,4 +1,5 @@
-﻿using DiabloRL.Entities;
+﻿using System;
+using DiabloRL.Entities;
 using GoRogue.GameFramework;
 using SadConsole.Entities;
 using SadRogue.Integration;

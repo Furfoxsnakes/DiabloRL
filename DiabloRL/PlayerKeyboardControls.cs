@@ -2,6 +2,7 @@
 using DiabloRL.AI;
 using DiabloRL.Behaviors;
 using DiabloRL.Entities;
+using DiabloRL.Things;
 using GoRogue.GameFramework;
 using SadRogue.Integration;
 using SadRogue.Integration.Keybindings;
@@ -27,6 +28,9 @@ namespace DiabloRL
 
             // Custom action system
             var player = Parent as Player;
+            
+            if (!player.AllComponents.GetFirstOrDefault<Energy>().HasEnergy) return;
+            
             player.SetBehavior(new OneShotBehavior(new WalkAction(player, direction)));
             
             if (!Game.GameScreen.Player.Behavior.NeedsUserInput)

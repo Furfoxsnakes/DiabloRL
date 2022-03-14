@@ -2,6 +2,7 @@
 using DiabloRL.Behaviors;
 using DiabloRL.Components.Stats;
 using DiabloRL.Entities;
+using DiabloRL.Things;
 using SadRogue.Integration;
 using SadRogue.Integration.FieldOfView.Memory;
 using SadRogue.Integration.Keybindings;
@@ -41,7 +42,11 @@ namespace DiabloRL
             };
             
             player.SetBehavior(new OneShotBehavior(null));
-            
+
+            var energy = new Energy(60);
+            energy.Fill();
+            player.AllComponents.Add(energy);
+
             // add some stats
             // assuming Warrior stats for now
             
@@ -63,6 +68,7 @@ namespace DiabloRL
             var enemy = new Goblin();
 
             enemy.SetBehavior(new MonsterBehavior(enemy));
+            enemy.AllComponents.Add(new Energy(20));
             // enemy.GoRogueComponents.Add(new GoRogueMonsterBehaviour(10, usesEnergy:false));
             
             // add some stats

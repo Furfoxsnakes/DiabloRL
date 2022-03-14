@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using DiabloRL.Entities;
+using DiabloRL.Things;
 using SadRogue.Integration;
 
 namespace DiabloRL.Actions
@@ -58,6 +59,15 @@ namespace DiabloRL.Actions
             _actions = null;
 
             return result;
+        }
+
+        public void AfterSuccess()
+        {
+            if (_consumesEnergy && (GameEntity != null))
+            {
+                GameEntity.AllComponents.GetFirstOrDefault<Energy>()?.Spend();
+                _consumesEnergy = false; 
+            }
         }
 
         protected abstract ActionResult OnProcess();

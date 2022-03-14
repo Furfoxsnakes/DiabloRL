@@ -19,7 +19,7 @@ namespace DiabloRL.Behaviors
             var target = Game.GameScreen.Player;
             var distance = target.Position - _enemy.Position;
             
-            var path = _enemy.CurrentMap.AStar.ShortestPath(_enemy.Position, Game.GameScreen.Player.Position);
+            var path = _enemy.CurrentMap.AStar.ShortestPath(_enemy.Position, target.Position);
             
             // couldn't find a path so the monster will just stand still like an idiot
             if (path == null) return new WalkAction(_enemy, Direction.None);
