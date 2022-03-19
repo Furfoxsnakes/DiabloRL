@@ -18,7 +18,7 @@ namespace DiabloRL
     public class MapScreen : ScreenObject
     {
         public readonly GameMap Map;
-        public readonly GameEntity Player;
+        public readonly Player Player;
         public readonly MessageLogConsole MessageLog;
 
         const int MessageLogHeight = 5;
@@ -81,12 +81,12 @@ namespace DiabloRL
 
         private IEnumerable<GameResult> CreateProcessEnumerable()
         {
+            // while the game is playing
             while (true)
             {
                 foreach (GameEntity entity in Map.Entities.Items)
                 // for (var entityIndex = 0; entityIndex < Map.Entities.Count; entityIndex++)
                 {
-                    Console.WriteLine($"{entity.Name} : {entity.AllComponents.GetFirst<Energy>().Curent}");
                     var energy = entity.AllComponents.GetFirstOrDefault<Energy>();
                     while (energy.HasEnergy)
                     {
@@ -115,9 +115,7 @@ namespace DiabloRL
             while (actions.Count > 0)
             {
                 var action = actions.Peek();
-                
-                Console.WriteLine(action);
-        
+
                 var result = action.Process(actions);
                 
                 // cascade through alternate actions if possible

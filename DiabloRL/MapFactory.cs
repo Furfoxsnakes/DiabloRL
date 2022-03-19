@@ -1,4 +1,5 @@
-﻿using GoRogue.MapGeneration;
+﻿using DiabloRL.Entities;
+using GoRogue.MapGeneration;
 using SadRogue.Integration.FieldOfView.Memory;
 using SadRogue.Primitives.GridViews;
 
@@ -52,7 +53,7 @@ namespace DiabloRL
             // Generate 10 enemies, placing them in random walkable locations for demo purposes.
             for (int i = 0; i < 10; i++)
             {
-                var enemy = MapObjectFactory.Enemy();
+                var enemy = new Zombur();
                 enemy.Position = map.WalkabilityView.RandomPosition(true);
                 map.AddEntity(enemy);
             }

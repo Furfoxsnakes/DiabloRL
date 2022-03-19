@@ -23,7 +23,7 @@ public abstract class FluidStat : StatBaseComponent
 
     public FluidStat(int baseValue) : base(baseValue)
     {
-        
+        _current = baseValue;
     }
 
     public abstract int GetMax();

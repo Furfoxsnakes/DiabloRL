@@ -23,7 +23,10 @@ namespace DiabloRL.Actions.Basic
             {
                 var target = Map.GetEntityAt<GameEntity>(newPos);
                 if (target == null)
-                    return Fail($"{GameEntity.Name} cannot move from {GameEntity.Position} to {newPos}");
+                    // just have the monster stand around like an idiot
+                    // TODO: add an AI system to have the monster decide what to do if this fails
+                    return new WalkAction(GameEntity, Direction.None);
+                    // return Fail($"{GameEntity.Name} cannot move from {GameEntity.Position} to {newPos}");
                 
                 // otherwise attack the target
                 return new AttackAction(GameEntity, target);
@@ -32,6 +35,7 @@ namespace DiabloRL.Actions.Basic
 
             // Entity can move to the new position
             GameEntity.Position = newPos;
+            GameEntity.PreviousMoveDirection = _direction;
 
             return ActionResult.Done;
         }

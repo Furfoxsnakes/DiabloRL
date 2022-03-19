@@ -1,17 +1,20 @@
-﻿using DiabloRL.Actions;
+﻿using System;
 using DiabloRL.Actions.Basic;
 using DiabloRL.Entities;
 using SadRogue.Primitives;
+using Action = DiabloRL.Actions.Action;
 
 namespace DiabloRL.Behaviors
 {
     public class MonsterBehavior : Behavior
     {
         public Enemy Enemy => _enemy;
+        protected Random Rand;
         
         public MonsterBehavior(Enemy enemy)
         {
             _enemy = enemy;
+            Rand = new Random(System.DateTime.UtcNow.Second);
         }
 
         public override Action NextAction()

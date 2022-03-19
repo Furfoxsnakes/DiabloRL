@@ -19,7 +19,7 @@ namespace DiabloRL.Entities
         public Vitality Vitality => AllComponents.GetFirstOrDefault<Vitality>();
         public Mana Mana => AllComponents.GetFirstOrDefault<Mana>();
         
-        public Player() : base(foreground: Color.Yellow, background: Color.Black, glyph: '@', walkable: false, transparent: false, 1)
+        public Player() : base(foreground: Color.Yellow, background: Color.Black, glyph: '@', walkable: false, transparent: true, 1)
         {
             // Add component for controlling player movement via keyboard.  Other (non-movement) keybindings can be
             // added as well
@@ -47,6 +47,31 @@ namespace DiabloRL.Entities
             
             // send it back
             return attack;
+        }
+
+        public override void Die(Action action)
+        {
+            
+        }
+
+        public void Killed(Action action, Enemy enemy)
+        {
+            var enemyExp = enemy.AllComponents.GetFirstOrDefault<Experience>();
+            if (enemyExp == null)
+                throw new NullReferenceException("Enemy needs an experience stat component");
+
+            GainExperience(action, enemyExp.Current);
+        }
+
+        public void GainExperience(Action action, float exp)
+        {
+            var expStat = AllComponents.GetFirstOrDefault<Experience>();
+
+            if (expStat == null)
+                throw new NullReferenceException("Player needs an experience stat component");
+            
+            expStat.Current += (int)exp;
+            action.Log($"{Name} received {exp} experience and now has {expStat.Current} experience.");
         }
     }
 }

@@ -56,6 +56,7 @@ namespace DiabloRL
             player.AllComponents.Add(new Vitality(25));
             player.AllComponents.Add(new Life(2, 2, 2, 18, 2));
             player.AllComponents.Add(new Mana(1, 1, 1, -1, 1));
+            player.AllComponents.Add(new Experience(0));
 
             // init stats
             player.Life.Current = player.Life.Max;
@@ -63,21 +64,21 @@ namespace DiabloRL
             return player;
         }
 
-        public static Enemy Enemy()
-        {
-            var enemy = new Goblin();
-
-            enemy.SetBehavior(new MonsterBehavior(enemy));
-            enemy.AllComponents.Add(new Energy(20));
-            // enemy.GoRogueComponents.Add(new GoRogueMonsterBehaviour(10, usesEnergy:false));
-            
-            // add some stats
-            enemy.AllComponents.Add(new Life(30));
-            
-            // init stats
-            enemy.Life.Current = enemy.Life.Max;
-
-            return enemy;
-        }
+        // public static Enemy Enemy()
+        // {
+        //     var enemy = new Goblin();
+        //
+        //     enemy.SetBehavior(new MonsterBehavior(enemy));
+        //     enemy.AllComponents.Add(new Energy(40));
+        //     // enemy.GoRogueComponents.Add(new GoRogueMonsterBehaviour(10, usesEnergy:false));
+        //     
+        //     // add some stats
+        //     enemy.AllComponents.Add(new Life(30));
+        //     
+        //     // init stats
+        //     enemy.Life.Current = enemy.Life.Max;
+        //
+        //     return enemy;
+        // }
     }
 }
