@@ -1,4 +1,5 @@
-﻿using SadConsole;
+﻿using DiabloRL.Resources;
+using SadConsole;
 
 namespace DiabloRL
 {
@@ -20,6 +21,7 @@ namespace DiabloRL
 
         public static MapScreen GameScreen;
         public static GameState GameState;
+        public static Content Content;
 
         private static void Main()
         {
@@ -31,6 +33,9 @@ namespace DiabloRL
 
         private static void Init()
         {
+            Content = new Content();
+            ExperienceData.Load(Content);
+            
             // Generate a dungeon map
             var map = MapFactory.GenerateDungeonMap(MapWidth, MapHeight);
 

@@ -19,7 +19,7 @@ public class Zombur : Enemy
         AllComponents.Add(new Energy(40));
         AllComponents.Add(new Life(5));
         AllComponents.Add(new Intelligence(3));
-        AllComponents.Add(new Experience(10));
+        AllComponents.Add(new Experience(4000));
         
         // init their stats
         Life.Current = Life.Max;

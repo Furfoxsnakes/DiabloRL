@@ -14,8 +14,8 @@ namespace DiabloRL.Entities
     {
 
         public Behavior Behavior => _behavior;
-        
-        public Life Life => AllComponents.GetFirstOrDefault<Life>();
+
+        public Life Life => GetStat<Life>();
 
         public Direction PreviousMoveDirection;
         
@@ -61,6 +61,13 @@ namespace DiabloRL.Entities
             {
                 // tell why no damage was done
             }
+        }
+
+        public T GetStat<T>() where T : StatBaseComponent
+        {
+            if (!AllComponents.Contains<T>()) return null;
+
+            return AllComponents.GetFirstOrDefault<T>();
         }
 
         public virtual int ReceiveDamage(Attack attack)

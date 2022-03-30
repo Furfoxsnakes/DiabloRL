@@ -18,7 +18,8 @@ namespace DiabloRL.Entities
     {
         public Vitality Vitality => AllComponents.GetFirstOrDefault<Vitality>();
         public Mana Mana => AllComponents.GetFirstOrDefault<Mana>();
-        
+        public PlayerClass Class => AllComponents.GetFirstOrDefault<PlayerClass>();
+
         public Player() : base(foreground: Color.Yellow, background: Color.Black, glyph: '@', walkable: false, transparent: true, 1)
         {
             // Add component for controlling player movement via keyboard.  Other (non-movement) keybindings can be
@@ -60,7 +61,8 @@ namespace DiabloRL.Entities
             if (enemyExp == null)
                 throw new NullReferenceException("Enemy needs an experience stat component");
 
-            GainExperience(action, enemyExp.Current);
+            // GainExperience(action, enemyExp.Current);
+            Class.Experience.Gain(action, enemyExp.Current);
         }
 
         public void GainExperience(Action action, float exp)

@@ -1,5 +1,7 @@
-﻿using DiabloRL.AI;
+﻿using System;
+using DiabloRL.AI;
 using DiabloRL.Behaviors;
+using DiabloRL.Components;
 using DiabloRL.Components.Stats;
 using DiabloRL.Entities;
 using DiabloRL.Things;
@@ -56,7 +58,9 @@ namespace DiabloRL
             player.AllComponents.Add(new Vitality(25));
             player.AllComponents.Add(new Life(2, 2, 2, 18, 2));
             player.AllComponents.Add(new Mana(1, 1, 1, -1, 1));
-            player.AllComponents.Add(new Experience(0));
+            player.AllComponents.Add(new Experience(3000));
+            player.AllComponents.Add(new PlayerClass());
+            
 
             // init stats
             player.Life.Current = player.Life.Max;

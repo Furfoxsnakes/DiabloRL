@@ -13,6 +13,13 @@
 
     <ItemGroup>
       <Folder Include="Behaviors\Player" />
+      <Folder Include="Common" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Resources\ExperienceData.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
