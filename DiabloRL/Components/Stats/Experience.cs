@@ -1,5 +1,7 @@
-﻿using DiabloRL.Actions;
+﻿using System;
+using System.Linq;
 using DiabloRL.Resources;
+using Action = DiabloRL.Actions.Action;
 
 namespace DiabloRL.Components.Stats;
 
@@ -32,13 +34,14 @@ public class Experience : FluidStat
     protected override void OnChanged()
     {
         base.OnChanged();
-        this.PostNotification(NotificationString, this);
+        
     }
     
     public void Gain(Action action, int amount)
     {
-        Current += amount;
-        action.Log($"{Parent.Name} received {amount} experience and now has {Current} experience.");
+        // do not allow to go over the max experience possible
+        Current = Math.Min(Current + amount, Game.Content.ExperienceData.Last());
+        // check if the entity leveled up
         RefreshLevel(action);
     }
 

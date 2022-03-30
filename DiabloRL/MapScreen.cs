@@ -37,7 +37,11 @@ namespace DiabloRL
             // manage them yourself; but you must call the map's RemoveRenderer when you're done with these renderers,
             // and you must add any non-default renderers to the SadConsole screen object hierarchy, IN ADDITION
             // to the map itself.
-            Map.DefaultRenderer = Map.CreateRenderer((Game.Width, Game.Height - MessageLogHeight));
+            
+            // load custom font/sprites for the dungeon
+            var font = SadConsole.Game.Instance.LoadFont("Resources/Fonts/Buddy.font");
+            // 16 & 12 are arbitrary based on trial and error. Should come up with a better system to calculate
+            Map.DefaultRenderer = Map.CreateRenderer((Game.Width - 16, Game.Height + 12 - MessageLogHeight), font);
 
             // Make the Map (which is also a screen object) a child of this screen.  You MUST have the map as a child
             // of the active screen, even if you are using entirely custom renderers.

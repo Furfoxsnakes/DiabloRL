@@ -17,7 +17,7 @@ namespace DiabloRL
 
         // Map width/height
         private const int MapWidth = 100;
-        private const int MapHeight = 60;
+        private const int MapHeight = 100;
 
         public static MapScreen GameScreen;
         public static GameState GameState;
