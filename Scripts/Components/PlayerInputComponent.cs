@@ -7,7 +7,7 @@ using SadRogue.Primitives;
 
 namespace DiabloRL.Scripts.Components;
 
-public partial class PlayerInputComponent : ParentAwareComponentBase<GameObject> {
+public partial class PlayerInputComponent : ParentAwareComponentBase<DiabloGameObject> {
     public Point GetMovement(InputEvent inputEvent) {
         var movement = Point.None;
         if (inputEvent is InputEventKey inputEventKey) {

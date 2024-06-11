@@ -4,92 +4,114 @@ using Godot;
 using GoRogue;
 using GoRogue.Components;
 using GoRogue.GameFramework;
+using GoRogue.Random;
 using SadRogue.Primitives;
 
 namespace DiabloRL.Scripts.Cartography.Tiles;
 
 public partial class DiabloGameObject : Sprite2D, IGameObject {
     private GameObjectDetails _gameObjectDetails;
-    private IGameObject _gameObjectImplementation;
 
-    public DiabloGameObject(Point pos, GameObjectDetails details, int layer) {
-        _gameObjectImplementation = new GameObject(pos, layer, details.IsWalkable, details.IsTransparent);
-        Position = pos;
+    public DiabloGameObject(Point pos, GameObjectDetails details, int layer) : this(pos, layer, details.IsWalkable, details.IsTransparent) {
         _gameObjectDetails = details;
+        Position = pos;
         Texture = _gameObjectDetails.SpriteTexture;
+        GD.Print(IsWalkable);
     }
-
     public DiabloGameObject() {
         
     }
+    private bool _isWalkable;
+    private Point _position;
+    
+    public DiabloGameObject(Point position, int layer, bool isWalkable = true, bool isTransparent = true,
+                      Func<uint>? idGenerator = null, IComponentCollection? customComponentCollection = null)
+        : this(layer, isWalkable, isTransparent, idGenerator, customComponentCollection)
+    {
+        Position = position;
+    }
 
-    public uint ID => _gameObjectImplementation.ID;
+    public DiabloGameObject(int layer, bool isWalkable = true, bool isTransparent = true,
+                      Func<uint>? idGenerator = null, IComponentCollection? customComponentCollection = null)
+    {
+        idGenerator ??= GlobalRandom.DefaultRNG.NextUInt;
 
-    public int Layer => _gameObjectImplementation.Layer;
+        Layer = layer;
+        IsWalkable = isWalkable;
+        IsTransparent = isTransparent;
 
-    public IComponentCollection GoRogueComponents => _gameObjectImplementation.GoRogueComponents;
+        _currentMap = null;
 
-    public new Point Position {
-        get => _gameObjectImplementation.Position;
+        ID = idGenerator();
+        GoRogueComponents = customComponentCollection ?? new ComponentCollection();
+        GoRogueComponents.ParentForAddedComponents = this;
+    }
+
+    /// <inheritdoc />
+    public new Point Position
+    {
+        get => _position;
         set {
-            _gameObjectImplementation.Position = value;
+            this.SafelySetProperty( ref _position, value, PositionChanging, PositionChanged);
             GlobalPosition = new Vector2(value.X, value.Y) * 32;
         }
     }
 
-    public event EventHandler<ValueChangedEventArgs<Point>> PositionChanging {
-        add => _gameObjectImplementation.PositionChanging += value;
-        remove => _gameObjectImplementation.PositionChanging -= value;
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<Point>>? PositionChanging;
+
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<Point>>? PositionChanged;
+
+    /// <inheritdoc />
+    public bool IsWalkable
+    {
+        get => _isWalkable;
+        set => this.SafelySetProperty(ref _isWalkable, value, WalkabilityChanging, WalkabilityChanged);
     }
 
-    public event EventHandler<ValueChangedEventArgs<Point>> PositionChanged {
-        add => _gameObjectImplementation.PositionChanged += value;
-        remove => _gameObjectImplementation.PositionChanged -= value;
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<bool>>? WalkabilityChanging;
+
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<bool>>? WalkabilityChanged;
+
+    private bool _isTransparent;
+
+    /// <inheritdoc />
+    public bool IsTransparent
+    {
+        get => _isTransparent;
+        set => this.SafelySetProperty(ref _isTransparent, value, TransparencyChanging, TransparencyChanged);
     }
 
-    public void OnMapChanged(Map newMap) {
-        _gameObjectImplementation.OnMapChanged(newMap);
-    }
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<bool>>? TransparencyChanging;
 
-    public Map CurrentMap => _gameObjectImplementation.CurrentMap;
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<bool>>? TransparencyChanged;
 
-    public bool IsTransparent {
-        get => _gameObjectImplementation.IsTransparent;
-        set => _gameObjectImplementation.IsTransparent = value;
-    }
+    /// <inheritdoc />
+    public uint ID { get; }
 
-    public bool IsWalkable {
-        get => _gameObjectImplementation.IsWalkable;
-        set => _gameObjectImplementation.IsWalkable = value;
-    }
+    /// <inheritdoc />
+    public int Layer { get; }
 
-    public event EventHandler<GameObjectCurrentMapChanged> AddedToMap {
-        add => _gameObjectImplementation.AddedToMap += value;
-        remove => _gameObjectImplementation.AddedToMap -= value;
-    }
+    private Map? _currentMap;
 
-    public event EventHandler<GameObjectCurrentMapChanged> RemovedFromMap {
-        add => _gameObjectImplementation.RemovedFromMap += value;
-        remove => _gameObjectImplementation.RemovedFromMap -= value;
-    }
+    /// <inheritdoc />
+    public Map? CurrentMap => _currentMap;
 
-    public event EventHandler<ValueChangedEventArgs<bool>> TransparencyChanging {
-        add => _gameObjectImplementation.TransparencyChanging += value;
-        remove => _gameObjectImplementation.TransparencyChanging -= value;
-    }
+    /// <inheritdoc />
+    public event EventHandler<GameObjectCurrentMapChanged>? AddedToMap;
 
-    public event EventHandler<ValueChangedEventArgs<bool>> TransparencyChanged {
-        add => _gameObjectImplementation.TransparencyChanged += value;
-        remove => _gameObjectImplementation.TransparencyChanged -= value;
-    }
+    /// <inheritdoc />
+    public event EventHandler<GameObjectCurrentMapChanged>? RemovedFromMap;
 
-    public event EventHandler<ValueChangedEventArgs<bool>> WalkabilityChanging {
-        add => _gameObjectImplementation.WalkabilityChanging += value;
-        remove => _gameObjectImplementation.WalkabilityChanging -= value;
-    }
+    /// <inheritdoc />
+    public IComponentCollection GoRogueComponents { get; }
 
-    public event EventHandler<ValueChangedEventArgs<bool>> WalkabilityChanged {
-        add => _gameObjectImplementation.WalkabilityChanged += value;
-        remove => _gameObjectImplementation.WalkabilityChanged -= value;
-    }
+    /// <inheritdoc />
+    public void OnMapChanged(Map? newMap)
+        => this.SafelySetCurrentMap(ref _currentMap, newMap, AddedToMap, RemovedFromMap);
 }

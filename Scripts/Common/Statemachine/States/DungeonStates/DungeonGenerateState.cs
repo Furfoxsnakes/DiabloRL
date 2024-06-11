@@ -30,6 +30,8 @@ public partial class DungeonGenerateState : DungeonState {
         generator.ConfigAndGenerateSafe(gen => {
             gen.AddSteps(DefaultAlgorithms.RectangleMapSteps());
         });
+        
+        Dungeon.Map = new Map(25, 25, 1, Distance.Chebyshev);
 
         var wallFloorValue = generator.Context.GetFirst<ISettableGridView<bool>>("WallFloor");
         foreach (var pos in wallFloorValue.Positions()) {
@@ -39,8 +41,7 @@ public partial class DungeonGenerateState : DungeonState {
             } else {
                 tile = new DiabloGameObject(pos, _wallDetails, layer: 0);
             }
-
-            Dungeon.Map = new Map(25, 25, 1, Distance.Chebyshev);
+            
             Dungeon.Map.SetTerrain(tile);
             AddChild(tile);
         }
