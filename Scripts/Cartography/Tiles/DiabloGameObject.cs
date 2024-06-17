@@ -1,22 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 using Godot;
-using GoRogue;
 using GoRogue.Components;
+using GoRogue.FOV;
 using GoRogue.GameFramework;
 using GoRogue.Random;
 using SadRogue.Primitives;
+using SadRogue.Primitives.GridViews;
+using Color = Godot.Color;
 
 namespace DiabloRL.Scripts.Cartography.Tiles;
 
 public partial class DiabloGameObject : Sprite2D, IGameObject {
-    private GameObjectDetails _gameObjectDetails;
+    public GameObjectDetails Details;
+    public bool IsExplored = false;
 
     public DiabloGameObject(Point pos, GameObjectDetails details, int layer) : this(pos, layer, details.IsWalkable, details.IsTransparent) {
-        _gameObjectDetails = details;
-        Position = pos;
-        Texture = _gameObjectDetails.SpriteTexture;
-        GD.Print(IsWalkable);
+        Details = details;
+        Texture = Details.SpriteTexture;
     }
     public DiabloGameObject() {
         
@@ -31,6 +31,12 @@ public partial class DiabloGameObject : Sprite2D, IGameObject {
         Position = position;
     }
 
+    public virtual void OnPlayerFovCalcuated(IFOV fov) {
+        
+    }
+
+    #region GoRogue GameObject
+    
     public DiabloGameObject(int layer, bool isWalkable = true, bool isTransparent = true,
                       Func<uint>? idGenerator = null, IComponentCollection? customComponentCollection = null)
     {
@@ -114,4 +120,5 @@ public partial class DiabloGameObject : Sprite2D, IGameObject {
     /// <inheritdoc />
     public void OnMapChanged(Map? newMap)
         => this.SafelySetCurrentMap(ref _currentMap, newMap, AddedToMap, RemovedFromMap);
+    #endregion
 }

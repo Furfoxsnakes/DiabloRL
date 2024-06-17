@@ -1,7 +1,6 @@
-﻿using System.Linq;
-using DiabloRL.Scripts.Cartography.Dungeon;
-using DiabloRL.Scripts.Cartography.Tiles;
+﻿using DiabloRL.Scripts.Cartography.Tiles;
 using DiabloRL.Scripts.Components;
+using DiabloRL.Scripts.Interfaces;
 using Godot;
 using GoRogue.GameFramework;
 using SadRogue.Primitives;
@@ -15,12 +14,21 @@ public partial class DungeonExploreState : DungeonState {
     }
 
     public override void HandleInput(InputEvent inputEvent) {
-        foreach (var entity in Dungeon.Map.Entities.Items) {
+        foreach (DiabloGameObject entity in Dungeon.Map.Entities.Items) {
             if (entity.GoRogueComponents.Contains<PlayerInputComponent>()) {
                 var movement = entity.GoRogueComponents.GetFirst<PlayerInputComponent>().GetMovement(inputEvent);
-                if (movement != Point.Zero) {
-                    if (entity.CanMove(entity.Position + movement)) {
+                if (movement != Direction.None) {
+                    // var newPos = entity.Position + movement;
+                    if (entity.CanMoveIn(movement)) {
                         entity.Position += movement;
+                        Dungeon.CalculatePlayerFov();
+                    } else {
+                        var blockingObject = Dungeon.Map.GetObjectAt<DiabloGameObject>(entity.Position + movement);
+                        if (blockingObject is IBumpable bumpable) {
+                            if (bumpable.OnBumped(entity)) {
+                                Dungeon.CalculatePlayerFov();
+                            }
+                        }
                     }
                 }
             }

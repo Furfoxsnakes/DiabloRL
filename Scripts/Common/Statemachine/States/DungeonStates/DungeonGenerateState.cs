@@ -1,8 +1,12 @@
 ﻿using DiabloRL.Scripts.Cartography.Tiles;
 using DiabloRL.Scripts.Components;
 using Godot;
+using GoRogue.FOV;
 using GoRogue.GameFramework;
 using GoRogue.MapGeneration;
+using GoRogue.MapGeneration.ContextComponents;
+using GoRogue.MapGeneration.Steps;
+using GoRogue.MapGeneration.Steps.Translation;
 using SadRogue.Primitives;
 using SadRogue.Primitives.GridViews;
 
@@ -13,46 +17,131 @@ public partial class DungeonGenerateState : DungeonState {
     [Export] private GameObjectDetails _floorDetails;
     [Export] private GameObjectDetails _wallDetails;
     [Export] private GameObjectDetails _playerDetails;
+    [Export] private GameObjectDetails _doorDetails;
+
+    [Export(PropertyHint.Range, "0, 50")] private int _numMonstersToSpawn = 10;
+    [Export] private GameObjectDetails _skelemanDetails;
+
+    private ItemList<Rectangle> _rooms;
+    private DoorList _doors;
+    
     public override void Enter() {
 
         GD.Print("Generating dungeon...");
+        
         GenerateTerrain();
+        SpawnMonsters();
         SpawnPlayer();
         
         Complete();
     }
 
     private void GenerateTerrain() {
-        // var terrainMap = new ArrayMap2D<bool>(25, 25);
-        // QuickGenerators.GenerateRectangleMap(terrainMap);
-
-        var generator = new Generator(25, 25);
+        var generator = new Generator(50, 50);
+        
         generator.ConfigAndGenerateSafe(gen => {
-            gen.AddSteps(DefaultAlgorithms.RectangleMapSteps());
+            gen.AddStep(
+                
+                new RoomsGeneration {
+                    MinRooms = 10,
+                    MaxRooms = 20,
+                    RoomMinSize = 5,
+                    RoomMaxSize = 9
+                }
+            )
+            .AddStep(
+                new MazeGeneration()
+            ).AddStep(
+                new RectanglesToAreas("Rooms", "Areas")
+            ).AddStep(
+                new RoomDoorConnection {
+                    CancelConnectionPlacementChance = 90
+                }
+            ).AddStep(
+                new TunnelDeadEndTrimming {
+                    SaveDeadEndChance = 0
+                }
+            );
         });
         
-        Dungeon.Map = new Map(25, 25, 1, Distance.Chebyshev);
+        Dungeon.Map = new Map(generator.Context.Width, generator.Context.Height, 1, Distance.Chebyshev);
+        // should be moved to a new class that inherits GameFramework.Map
+        // Just doing it here for testing purposes
+        var transparencyView = new LambdaTranslationGridView<IGameObject, bool>(
+                Dungeon.Map.Terrain, t=> t.IsTransparent
+            );
+        Dungeon.Map.PlayerFOV = new RecursiveShadowcastingFOV(transparencyView); 
 
         var wallFloorValue = generator.Context.GetFirst<ISettableGridView<bool>>("WallFloor");
         foreach (var pos in wallFloorValue.Positions()) {
-            DiabloGameObject tile = null;
+            DiabloTerrain tile = null;
             if (wallFloorValue[pos]) {
-                tile = new DiabloGameObject(pos, _floorDetails, layer: 0);
+                tile = new DiabloTerrain(pos, _floorDetails);
             } else {
-                tile = new DiabloGameObject(pos, _wallDetails, layer: 0);
+                tile = new DiabloTerrain(pos, _wallDetails);
             }
             
             Dungeon.Map.SetTerrain(tile);
-            AddChild(tile);
+            Dungeon.AddDiabloGameObject(tile);
+        }
+
+        _rooms = generator.Context.GetFirst<ItemList<Rectangle>>("Rooms");
+        _doors = generator.Context.GetFirst<DoorList>("Doors");
+
+        foreach (var rectangleDoors in _doors.DoorsPerRoom) {
+            foreach (var doorPos in rectangleDoors.Value.Doors) {
+                // var door = new DiabloGameObject(doorPos, _doorDetails, 0);
+                var door = new Door(doorPos);
+                Dungeon.Map.SetTerrain(door);
+                Dungeon.AddDiabloGameObject(door);
+            }
+        }
+    }
+
+    private void SpawnMonsters() {
+
+        foreach (var rectangle in _rooms.Items) {
+            for (var i = 0; i < 4; i++) {
+                var randomPos = GetRandomPositionFromRectangle(rectangle);
+                var skeleman = new DiabloEntity(randomPos, _skelemanDetails);
+                while (!Dungeon.Map.CanAddEntity(skeleman)) {
+                    skeleman.Position = GetRandomPositionFromMap();
+                }
+                Dungeon.Map.AddEntity(skeleman);
+                Dungeon.AddDiabloGameObject(skeleman);
+            }
         }
     }
 
     private void SpawnPlayer() {
-        var player = new DiabloGameObject((5, 5), _playerDetails, 1);
+        var firstRoom = _rooms.Items[0];
+        var player = new DiabloEntity(firstRoom.Center, _playerDetails);
         Dungeon.PlayerObject = player;
         Dungeon.Map.AddEntity(player);
         var playerInputComponent = new PlayerInputComponent();
         player.GoRogueComponents.Add(playerInputComponent);
-        AddChild(player);
+        var camera2D = new Camera2D {
+            Enabled = true,
+            Zoom = new Vector2(2, 2)
+        };
+        player.AddChild(camera2D);
+        
+        Dungeon.AddDiabloGameObject(player);
+
+        Dungeon.CalculatePlayerFov();
+    }
+
+    private Point GetRandomPositionFromMap() {
+        GD.Randomize();
+        var randX = GD.RandRange(0, Dungeon.Map.Width);
+        var randY = GD.RandRange(0, Dungeon.Map.Height);
+        return (randX, randY);
+    }
+
+    private Point GetRandomPositionFromRectangle(Rectangle rect) {
+        GD.Randomize();
+        var randPosX = GD.RandRange(rect.MinExtentX, rect.MaxExtentX);
+        var randPosY = GD.RandRange(rect.MinExtentY, rect.MaxExtentY);
+        return (randPosX, randPosY);
     }
 }
