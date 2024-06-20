@@ -14,7 +14,7 @@ public partial class Dungeon : Node {
     [Export] private DungeonState _generateState;
     [Export] private DungeonState _exploreState;
 
-    public DiabloGameObject PlayerObject;
+    public DiabloEntity PlayerEntity;
     public Map Map;
 
     public delegate void FOVCalculated(IFOV fov);
@@ -42,7 +42,7 @@ public partial class Dungeon : Node {
     }
 
     public void CalculatePlayerFov() {
-        Map.PlayerFOV.Calculate(PlayerObject.Position, 5, Distance.Euclidean);
+        Map.PlayerFOV.Calculate(PlayerEntity.Position, 5, Distance.Euclidean);
         OnFOVClaculated?.Invoke(Map.PlayerFOV);
     }
 }

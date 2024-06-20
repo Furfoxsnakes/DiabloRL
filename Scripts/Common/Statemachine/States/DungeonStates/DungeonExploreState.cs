@@ -1,6 +1,8 @@
 ﻿using DiabloRL.Scripts.Cartography.Tiles;
 using DiabloRL.Scripts.Components;
 using DiabloRL.Scripts.Interfaces;
+using DiabloRL.Scripts.Processing;
+using DiabloRL.Scripts.Processing.Actions;
 using Godot;
 using GoRogue.GameFramework;
 using SadRogue.Primitives;
@@ -13,25 +15,17 @@ public partial class DungeonExploreState : DungeonState {
         GD.Print("Exploring the dungeon...");
     }
 
-    public override void HandleInput(InputEvent inputEvent) {
-        foreach (DiabloGameObject entity in Dungeon.Map.Entities.Items) {
-            if (entity.GoRogueComponents.Contains<PlayerInputComponent>()) {
-                var movement = entity.GoRogueComponents.GetFirst<PlayerInputComponent>().GetMovement(inputEvent);
-                if (movement != Direction.None) {
-                    // var newPos = entity.Position + movement;
-                    if (entity.CanMoveIn(movement)) {
-                        entity.Position += movement;
-                        Dungeon.CalculatePlayerFov();
-                    } else {
-                        var blockingObject = Dungeon.Map.GetObjectAt<DiabloGameObject>(entity.Position + movement);
-                        if (blockingObject is IBumpable bumpable) {
-                            if (bumpable.OnBumped(entity)) {
-                                Dungeon.CalculatePlayerFov();
-                            }
-                        }
-                    }
-                }
-            }
+    public override void Do(float delta) {
+        var result = new GameResult();
+
+        while (!result.NeedsAction) {
+            result = Game.Instance.ProcessGame();
         }
+    }
+
+    public override void HandleInput(InputEvent inputEvent) {
+        var movementComponent = Dungeon.PlayerEntity.GoRogueComponents.GetFirst<PlayerInputComponent>();
+        var movement = movementComponent.GetMovement(inputEvent);
+        Dungeon.PlayerEntity.SetNextAction(new WalkAction(Dungeon.PlayerEntity, movement, Dungeon));
     }
 }

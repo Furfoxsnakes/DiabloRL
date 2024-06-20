@@ -1,5 +1,6 @@
 ﻿using DiabloRL.Scripts.Cartography.Tiles;
 using DiabloRL.Scripts.Components;
+using DiabloRL.Scripts.Processing.Behaviours;
 using Godot;
 using GoRogue.FOV;
 using GoRogue.GameFramework;
@@ -100,23 +101,24 @@ public partial class DungeonGenerateState : DungeonState {
 
     private void SpawnMonsters() {
 
-        foreach (var rectangle in _rooms.Items) {
-            for (var i = 0; i < 4; i++) {
-                var randomPos = GetRandomPositionFromRectangle(rectangle);
-                var skeleman = new DiabloEntity(randomPos, _skelemanDetails);
-                while (!Dungeon.Map.CanAddEntity(skeleman)) {
-                    skeleman.Position = GetRandomPositionFromMap();
-                }
-                Dungeon.Map.AddEntity(skeleman);
-                Dungeon.AddDiabloGameObject(skeleman);
-            }
-        }
+        // foreach (var rectangle in _rooms.Items) {
+        //     for (var i = 0; i < 4; i++) {
+        //         var randomPos = GetRandomPositionFromRectangle(rectangle);
+        //         var skeleman = new DiabloEntity(randomPos, _skelemanDetails);
+        //         while (!Dungeon.Map.CanAddEntity(skeleman)) {
+        //             skeleman.Position = GetRandomPositionFromMap();
+        //         }
+        //         Dungeon.Map.AddEntity(skeleman);
+        //         Dungeon.AddDiabloGameObject(skeleman);
+        //     }
+        // }
     }
 
     private void SpawnPlayer() {
         var firstRoom = _rooms.Items[0];
         var player = new DiabloEntity(firstRoom.Center, _playerDetails);
-        Dungeon.PlayerObject = player;
+        player.SetBehaviour(new OneShotBehaviour(null));
+        Dungeon.PlayerEntity = player;
         Dungeon.Map.AddEntity(player);
         var playerInputComponent = new PlayerInputComponent();
         player.GoRogueComponents.Add(playerInputComponent);
