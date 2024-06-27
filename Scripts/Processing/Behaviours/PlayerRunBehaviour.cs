@@ -29,6 +29,6 @@ public partial class PlayerRunBehaviour : PlayerBehaviour {
     }
 
     public override Action NextAction() {
-        return new WalkAction(PlayerEntity, _direction, _dungeon, true);
+        return new WalkAction(PlayerEntity, _direction, true);
     }
 }

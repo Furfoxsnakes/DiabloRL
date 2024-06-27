@@ -26,6 +26,6 @@ public partial class DungeonExploreState : DungeonState {
     public override void HandleInput(InputEvent inputEvent) {
         var movementComponent = Dungeon.PlayerEntity.GoRogueComponents.GetFirst<PlayerInputComponent>();
         var movement = movementComponent.GetMovement(inputEvent);
-        Dungeon.PlayerEntity.SetNextAction(new WalkAction(Dungeon.PlayerEntity, movement, Dungeon));
+        Dungeon.PlayerEntity.SetNextAction(new WalkAction(Dungeon.PlayerEntity, movement));
     }
 }

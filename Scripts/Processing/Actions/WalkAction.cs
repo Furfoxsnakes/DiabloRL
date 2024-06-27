@@ -1,4 +1,5 @@
-﻿using DiabloRL.Scripts.Cartography.Dungeon;
+﻿using System.Threading.Tasks;
+using DiabloRL.Scripts.Cartography.Dungeon;
 using DiabloRL.Scripts.Cartography.Tiles;
 using Godot;
 using SadRogue.Primitives;
@@ -8,42 +9,47 @@ namespace DiabloRL.Scripts.Processing.Actions;
 public partial class WalkAction : Action {
 
     private Direction _direction;
-    private Dungeon _dungeon;
+    // private Dungeon _dungeon;
     private bool _checkForCancel;
     
-    public WalkAction(DiabloEntity entity, Direction direction, Dungeon dungeon, bool checkForCancel = false) : base(entity) {
+    public WalkAction(DiabloEntity entity, Direction direction, bool checkForCancel = false) : base(entity) {
         _direction = direction;
-        _dungeon = dungeon;
+        // _dungeon = dungeon;
         _checkForCancel = checkForCancel;
     }
 
     protected override ActionResult OnProcess() {
         var newPos = DiabloEntity.Position + _direction;
-        var tile = _dungeon.Map.GetObjectAt<DiabloGameObject>(newPos);
+        var tile = DiabloEntity.CurrentMap.GetObjectAt<DiabloGameObject>(newPos);
 
         // check for a door and open it if it's closed
         if (tile is Door door) {
-            GD.Print($"{DiabloEntity.Details.Name} bumps his nose into a door. Ouch!");
-            return ActionResult.Done;
+            if (!door.IsOpen)
+            {
+                door.Open();
+                return ActionResult.Done;
+            }
         }
 
         // Check if there is an entity occupying the space
-        var occupier = _dungeon.Map.GetEntityAt<DiabloEntity>(newPos);
+        var occupier = DiabloEntity.CurrentMap.GetEntityAt<DiabloEntity>(newPos);
         if (occupier != null && occupier != DiabloEntity) {
-            GD.Print($"{DiabloEntity.Details.Name} attacks {occupier.Details.Name} with their fists");
-            return ActionResult.Done;
+            Game.Instance.DoBumpTweenByDirection(DiabloEntity, Direction.GetDirection(DiabloEntity.Position, occupier.Position));
+            return new AttackAction(DiabloEntity, occupier, DiabloEntity.GetAttack(occupier));
         }
 
-        if (!_dungeon.Map.GameObjectCanMove(DiabloEntity, newPos)) {
-            GD.Print("Cannot walk there.");
+        if (!DiabloEntity.CurrentMap.GameObjectCanMove(DiabloEntity, newPos)) {
+            var direction = Direction.GetDirection(DiabloEntity.Position, newPos);
+            if (direction != Direction.None) {
+                Game.Instance.DoBumpTweenByDirection(DiabloEntity, direction);
+            }
+            
             return ActionResult.Done;
-        }
-
-        DiabloEntity.Position = newPos;
-        if (DiabloEntity == _dungeon.PlayerEntity) {
-            _dungeon.CalculatePlayerFov();
         }
         
+        Game.Instance.DoMoveTweenByPosition(DiabloEntity,newPos);
+        DiabloEntity.Position = newPos;
+
         return ActionResult.Done;
     }
 }

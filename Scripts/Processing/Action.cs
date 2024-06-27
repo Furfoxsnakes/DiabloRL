@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using DiabloRL.Scripts.Cartography.Tiles;
 
 namespace DiabloRL.Scripts.Processing;
@@ -30,4 +31,10 @@ public abstract partial class Action {
     }
 
     protected abstract ActionResult OnProcess();
+
+    public virtual void AfterSuccess() {
+        if (DiabloEntity == null) return;
+        
+        DiabloEntity.Energy.Spend();
+    }
 }

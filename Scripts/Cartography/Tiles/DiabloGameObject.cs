@@ -14,6 +14,9 @@ public partial class DiabloGameObject : Sprite2D, IGameObject {
     public GameObjectDetails Details;
     public bool IsExplored = false;
 
+    [Signal]
+    public delegate void FinishedMovingEventHandler();
+
     public DiabloGameObject(Point pos, GameObjectDetails details, int layer) : this(pos, layer, details.IsWalkable, details.IsTransparent) {
         Details = details;
         Texture = Details.SpriteTexture;
@@ -29,6 +32,7 @@ public partial class DiabloGameObject : Sprite2D, IGameObject {
         : this(layer, isWalkable, isTransparent, idGenerator, customComponentCollection)
     {
         Position = position;
+        GlobalPosition = new Vector2(Position.X, Position.Y) * 32;
     }
 
     public virtual void OnPlayerFovCalcuated(IFOV fov) {
@@ -59,7 +63,7 @@ public partial class DiabloGameObject : Sprite2D, IGameObject {
         get => _position;
         set {
             this.SafelySetProperty( ref _position, value, PositionChanging, PositionChanged);
-            GlobalPosition = new Vector2(value.X, value.Y) * 32;
+            // GlobalPosition = new Vector2(value.X, value.Y) * 32;
         }
     }
 

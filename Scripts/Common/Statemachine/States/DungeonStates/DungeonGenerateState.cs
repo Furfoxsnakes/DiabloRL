@@ -1,4 +1,5 @@
 ﻿using DiabloRL.Scripts.Cartography.Tiles;
+using DiabloRL.Scripts.Cartography.Tiles.Entities;
 using DiabloRL.Scripts.Components;
 using DiabloRL.Scripts.Processing.Behaviours;
 using Godot;
@@ -31,8 +32,8 @@ public partial class DungeonGenerateState : DungeonState {
         GD.Print("Generating dungeon...");
         
         GenerateTerrain();
-        SpawnMonsters();
         SpawnPlayer();
+        SpawnMonsters();
         
         Complete();
     }
@@ -101,35 +102,31 @@ public partial class DungeonGenerateState : DungeonState {
 
     private void SpawnMonsters() {
 
-        // foreach (var rectangle in _rooms.Items) {
-        //     for (var i = 0; i < 4; i++) {
-        //         var randomPos = GetRandomPositionFromRectangle(rectangle);
-        //         var skeleman = new DiabloEntity(randomPos, _skelemanDetails);
-        //         while (!Dungeon.Map.CanAddEntity(skeleman)) {
-        //             skeleman.Position = GetRandomPositionFromMap();
-        //         }
-        //         Dungeon.Map.AddEntity(skeleman);
-        //         Dungeon.AddDiabloGameObject(skeleman);
-        //     }
-        // }
+        foreach (var rectangle in _rooms.Items) {
+            var randNumMonsters = GD.RandRange(1, 1);
+            for (var i = 0; i < randNumMonsters; i++) {
+                var randomPos = GetRandomPositionFromRectangle(rectangle);
+                var skeleman = new Monster(randomPos, _skelemanDetails, Dungeon);
+                while (!Dungeon.Map.CanAddEntity(skeleman)) {
+                    skeleman.Position = GetRandomPositionFromMap();
+                }
+                
+                Dungeon.AddEntity(skeleman);
+                skeleman.Name = $"{_skelemanDetails.Name} {i}";
+                // Dungeon.Map.AddEntity(skeleman);
+                // Dungeon.AddDiabloGameObject(skeleman);
+            }
+        }
     }
 
     private void SpawnPlayer() {
         var firstRoom = _rooms.Items[0];
-        var player = new DiabloEntity(firstRoom.Center, _playerDetails);
-        player.SetBehaviour(new OneShotBehaviour(null));
+        var player = new Player(firstRoom.Center, _playerDetails);
         Dungeon.PlayerEntity = player;
-        Dungeon.Map.AddEntity(player);
-        var playerInputComponent = new PlayerInputComponent();
-        player.GoRogueComponents.Add(playerInputComponent);
-        var camera2D = new Camera2D {
-            Enabled = true,
-            Zoom = new Vector2(2, 2)
-        };
-        player.AddChild(camera2D);
-        
-        Dungeon.AddDiabloGameObject(player);
-
+        Dungeon.AddEntity(player);
+        player.Name = "Player";
+        // Dungeon.Map.AddEntity(player);
+        // Dungeon.AddDiabloGameObject(player);
         Dungeon.CalculatePlayerFov();
     }
 
